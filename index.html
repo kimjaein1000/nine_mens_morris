@@ -1,0 +1,3542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nine Men's Morris</title>
+<style>
+/* ── 기본 리셋 & 폰트 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── 테마 변수 (기본: 클래식) ── */
+:root {
+    --body-bg: #f8f9fa;
+    --body-color: #333;
+    --card-bg: #ffffff;
+    --card-border: rgba(0,0,0,0.08);
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    --canvas-bg: #ffffff;
+    --canvas-border: 2px solid #333;
+    --canvas-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    --btn-bg: #ffffff;
+    --btn-border: #bbb;
+    --btn-color: #333;
+    --btn-hover-bg: #eeeeee;
+    --status-bg: rgba(0,0,0,0.05);
+    --status-border: rgba(0,0,0,0.12);
+    --status-color: #333;
+    --overlay-bg: rgba(0,0,0,0.55);
+    --box-bg: #ffffff;
+    --box-color: #333;
+    --theme-btn-bg: #333;
+    --theme-btn-color: #fff;
+    --header-h1: #222;
+    --header-sub: #888;
+    --piece-panel-bg: rgba(0,0,0,0.05);
+    --piece-panel-border: rgba(0,0,0,0.1);
+    --piece-label-color: #888;
+    --piece-count-color: #333;
+    --ai-info-color: #999;
+    --menu-card-bg: #f0f0f0;
+    --menu-card-border: rgba(0,0,0,0.1);
+    --menu-card-color: #333;
+    --menu-card-hover-bg: #e0e0e0;
+    --menu-card-sub: #888;
+    --tut-slide-color: #444;
+    --tut-h4-color: #2471a3;
+    --box-h3-color: #222;
+    --box-sub-color: #777;
+    --box-dot-bg: rgba(0,0,0,0.12);
+    --box-tip-color: #1a6a9a;
+    --box-warn-color: #7d6608;
+    --box-step-label: #aaa;
+    --box-close-color: #aaa;
+    --replay-upload-border: rgba(0,0,0,0.2);
+    --replay-upload-color: #888;
+    --replay-info-color: #555;
+    --replay-nav-color: #333;
+}
+
+/* ── 바우하우스 테마 변수 ── */
+/* 1919년 바우하우스 원칙: 원색(적·황·청), 굵은 검정선, 기하학, 흰 여백 */
+body.theme-bauhaus {
+    --body-bg: #f2ede4;
+    --body-color: #111;
+    --card-bg: #ffffff;
+    --card-border: #111;
+    --card-shadow: 6px 6px 0px #111;
+    --canvas-bg: #faf8f3;
+    --canvas-border: 3px solid #111;
+    --canvas-shadow: 6px 6px 0px #111;
+    --btn-bg: #ffffff;
+    --btn-border: #111;
+    --btn-color: #111;
+    --btn-hover-bg: #FFDD00;
+    --status-bg: #111;
+    --status-border: #111;
+    --status-color: #fff;
+    --overlay-bg: rgba(0,0,0,0.65);
+    --box-bg: #ffffff;
+    --box-color: #111;
+    --theme-btn-bg: #D62828;
+    --theme-btn-color: #fff;
+    --header-h1: #111;
+    --header-sub: #888;
+    --piece-panel-bg: #111;
+    --piece-panel-border: #111;
+    --piece-label-color: #aaa;
+    --piece-count-color: #fff;
+    --ai-info-color: #777;
+    --menu-card-bg: #ffffff;
+    --menu-card-border: #111;
+    --menu-card-color: #111;
+    --menu-card-hover-bg: #FFDD00;
+    --menu-card-sub: #888;
+    --tut-slide-color: #222;
+    --tut-h4-color: #D62828;
+    --box-h3-color: #111;
+    --box-sub-color: #555;
+    --box-dot-bg: rgba(0,0,0,0.12);
+    --box-tip-color: #1a6a9a;
+    --box-warn-color: #7d5a00;
+    --box-step-label: #888;
+    --box-close-color: #888;
+    --replay-upload-border: rgba(0,0,0,0.25);
+    --replay-upload-color: #666;
+    --replay-info-color: #444;
+    --replay-nav-color: #111;
+}
+
+/* 바우하우스 배경 장식 */
+body.theme-bauhaus::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+        radial-gradient(circle 60px at 10% 15%, rgba(214,40,40,0.1) 0%, transparent 60px),
+        radial-gradient(circle 90px at 90% 80%, rgba(0,63,136,0.08) 0%, transparent 90px),
+        radial-gradient(circle 45px at 85% 12%, rgba(255,221,0,0.12) 0%, transparent 45px);
+    pointer-events: none;
+}
+
+/* 바우하우스 카드: 굵은 테두리 + 오프셋 그림자 */
+body.theme-bauhaus #app-card {
+    border: 3px solid #111;
+    border-radius: 0;
+    box-shadow: 8px 8px 0 #111;
+}
+body.theme-bauhaus canvas {
+    border-radius: 0;
+}
+body.theme-bauhaus button {
+    border-radius: 0;
+    border: 2px solid #111;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+body.theme-bauhaus button:hover:not(:disabled) {
+    box-shadow: 3px 3px 0 #111;
+    transform: translate(-1px, -1px);
+}
+body.theme-bauhaus .menu-card {
+    border-radius: 0;
+    border: 2px solid #111;
+    box-shadow: none;
+}
+body.theme-bauhaus .menu-card:hover {
+    box-shadow: 4px 4px 0 #111;
+    transform: translate(-2px, -2px);
+}
+body.theme-bauhaus #status {
+    border-radius: 0;
+    font-family: 'Arial Black', Arial, sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+body.theme-bauhaus #app-header h1 {
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 1.6em;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+body.theme-bauhaus #tutorial-box,
+body.theme-bauhaus #replay-box {
+    border-radius: 0;
+    border: 3px solid #111;
+    box-shadow: 8px 8px 0 #111;
+}
+
+/* ── 사이버 테마 변수 ── */
+body.theme-cyber {
+    --body-bg: #060a14;
+    --body-color: #a0f0e8;
+    --card-bg: rgba(0,20,20,0.7);
+    --card-border: rgba(0,200,255,0.2);
+    --card-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    --canvas-bg: #0a0f1e;
+    --canvas-border: 1px solid rgba(0,200,255,0.2);
+    --canvas-shadow: 0 0 0 1px rgba(0,200,255,0.08), 0 8px 32px rgba(0,0,0,0.6), 0 0 40px rgba(0,200,255,0.08);
+    --btn-bg: rgba(0,200,255,0.08);
+    --btn-border: rgba(0,200,255,0.3);
+    --btn-color: #00e5ff;
+    --btn-hover-bg: rgba(0,200,255,0.18);
+    --status-bg: rgba(0,200,255,0.08);
+    --status-border: rgba(0,200,255,0.3);
+    --status-color: #00e5ff;
+    --overlay-bg: rgba(0,0,0,0.8);
+    --box-bg: rgba(0,15,20,0.95);
+    --box-color: #a0f0e8;
+    --theme-btn-bg: rgba(0,200,255,0.15);
+    --theme-btn-color: #00e5ff;
+    --header-h1: #00e5ff;
+    --header-sub: rgba(0,200,255,0.5);
+    --piece-panel-bg: rgba(0,200,255,0.05);
+    --piece-panel-border: rgba(0,200,255,0.15);
+    --piece-label-color: rgba(0,200,255,0.55);
+    --piece-count-color: #00e5ff;
+    --ai-info-color: rgba(0,200,255,0.45);
+    --menu-card-bg: rgba(0,200,255,0.06);
+    --menu-card-border: rgba(0,200,255,0.2);
+    --menu-card-color: #80e8f8;
+    --menu-card-hover-bg: rgba(0,200,255,0.14);
+    --menu-card-sub: rgba(0,200,255,0.45);
+    --tut-slide-color: #a0e8e0;
+    --tut-h4-color: #00e5ff;
+    --box-h3-color: #00e5ff;
+    --box-sub-color: rgba(0,200,255,0.5);
+    --box-dot-bg: rgba(0,200,255,0.2);
+    --box-tip-color: #60d8f0;
+    --box-warn-color: #f0d860;
+    --box-step-label: rgba(0,200,255,0.4);
+    --box-close-color: rgba(0,200,255,0.4);
+    --replay-upload-border: rgba(0,200,255,0.25);
+    --replay-upload-color: rgba(0,200,255,0.5);
+    --replay-info-color: rgba(0,220,255,0.7);
+    --replay-nav-color: #00e5ff;
+}
+
+/* ── 클레이모피즘 테마 변수 ── */
+/* 부드러운 점토 느낌 — 파스텔, 두꺼운 그림자, 소프트 보더 */
+body.theme-claymorphism {
+    --body-bg: #e8e0f0;
+    --body-color: #4a3f5c;
+    --card-bg: #f0eaf8;
+    --card-border: rgba(180,160,210,0.4);
+    --card-shadow: 0 12px 0 rgba(160,140,200,0.35), 0 20px 40px rgba(120,100,160,0.2);
+    --canvas-bg: #f5f0fc;
+    --canvas-border: 2px solid rgba(180,160,210,0.35);
+    --canvas-shadow: 0 10px 0 rgba(160,140,200,0.3), 0 16px 32px rgba(120,100,160,0.18);
+    --btn-bg: #ede5f8;
+    --btn-border: rgba(180,160,220,0.5);
+    --btn-color: #5a4a7a;
+    --btn-hover-bg: #e0d5f5;
+    --status-bg: rgba(200,180,240,0.25);
+    --status-border: rgba(180,160,220,0.4);
+    --status-color: #5a4a7a;
+    --overlay-bg: rgba(80,60,120,0.5);
+    --box-bg: #f0eaf8;
+    --box-color: #4a3f5c;
+    --theme-btn-bg: rgba(160,120,220,0.2);
+    --theme-btn-color: #8860cc;
+    --header-h1: #6040a0;
+    --header-sub: rgba(120,100,160,0.6);
+    --piece-panel-bg: rgba(200,180,240,0.2);
+    --piece-panel-border: rgba(180,160,220,0.3);
+    --piece-label-color: rgba(120,100,160,0.6);
+    --piece-count-color: #5a4a7a;
+    --ai-info-color: rgba(140,120,180,0.6);
+    --menu-card-bg: #ede5f8;
+    --menu-card-border: rgba(180,160,220,0.4);
+    --menu-card-color: #5a4a7a;
+    --menu-card-hover-bg: #e0d5f5;
+    --menu-card-sub: rgba(140,120,180,0.6);
+    --tut-slide-color: #5a4a7a;
+    --tut-h4-color: #8040c0;
+    --box-h3-color: #5a3a9a;
+    --box-sub-color: rgba(120,100,160,0.65);
+    --box-dot-bg: rgba(160,130,220,0.25);
+    --box-tip-color: #6050a8;
+    --box-warn-color: #a07020;
+    --box-step-label: rgba(140,120,180,0.5);
+    --box-close-color: rgba(140,120,180,0.5);
+    --replay-upload-border: rgba(180,160,220,0.35);
+    --replay-upload-color: rgba(140,120,180,0.6);
+    --replay-info-color: rgba(100,80,140,0.8);
+    --replay-nav-color: #5a4a7a;
+}
+
+body.theme-claymorphism::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+        radial-gradient(ellipse 70% 50% at 15% 20%, rgba(200,160,255,0.22) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 60% at 85% 80%, rgba(160,200,255,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 60% 10%, rgba(255,180,220,0.15) 0%, transparent 50%),
+        #e8e0f0;
+    pointer-events: none;
+}
+
+/* 클레이 카드: 두꺼운 아래 그림자 + 부드러운 모서리 */
+body.theme-claymorphism #app-card {
+    border-radius: 28px;
+    border: 2px solid rgba(200,180,240,0.5);
+    box-shadow: 0 12px 0 rgba(160,140,200,0.38), 0 20px 40px rgba(120,100,160,0.18);
+    background: rgba(245,240,252,0.95);
+}
+body.theme-claymorphism canvas {
+    border-radius: 24px;
+    box-shadow: 0 10px 0 rgba(160,140,200,0.32), 0 16px 32px rgba(120,100,160,0.15);
+}
+body.theme-claymorphism button {
+    border-radius: 16px;
+    border: 2px solid rgba(180,160,220,0.5);
+    box-shadow: 0 5px 0 rgba(160,130,210,0.35);
+    font-weight: 700;
+}
+body.theme-claymorphism button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 rgba(160,130,210,0.35);
+}
+body.theme-claymorphism button:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 rgba(160,130,210,0.35);
+}
+body.theme-claymorphism .menu-card {
+    border-radius: 20px;
+    border: 2px solid rgba(180,160,220,0.45);
+    box-shadow: 0 6px 0 rgba(160,130,210,0.32);
+}
+body.theme-claymorphism .menu-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 9px 0 rgba(160,130,210,0.32);
+}
+body.theme-claymorphism #status { border-radius: 20px; }
+body.theme-claymorphism #tutorial-box,
+body.theme-claymorphism #replay-box {
+    border-radius: 24px;
+    border: 2px solid rgba(200,180,240,0.5);
+    box-shadow: 0 10px 0 rgba(160,140,200,0.3), 0 16px 32px rgba(120,100,160,0.15);
+    background: rgba(245,240,252,0.98);
+}
+
+/* ── 호러 테마 변수 ── */
+body.theme-horror {
+    --body-bg: #0a0005;
+    --body-color: #c9a0a0;
+    --card-bg: #120008;
+    --card-border: rgba(139,0,0,0.5);
+    --card-shadow: 0 0 40px rgba(139,0,0,0.3), 0 8px 32px rgba(0,0,0,0.8);
+    --canvas-bg: #0d0008;
+    --canvas-border: 1px solid rgba(139,0,0,0.4);
+    --canvas-shadow: 0 0 30px rgba(139,0,0,0.25), 0 8px 32px rgba(0,0,0,0.7);
+    --btn-bg: rgba(80,0,0,0.4);
+    --btn-border: rgba(139,0,0,0.6);
+    --btn-color: #d4a0a0;
+    --btn-hover-bg: rgba(139,0,0,0.5);
+    --status-bg: rgba(80,0,0,0.3);
+    --status-border: rgba(139,0,0,0.5);
+    --status-color: #f0b0b0;
+    --overlay-bg: rgba(0,0,0,0.85);
+    --box-bg: #100008;
+    --box-color: #c9a0a0;
+    --theme-btn-bg: rgba(139,0,0,0.4);
+    --theme-btn-color: #ff6666;
+    --header-h1: #cc3333;
+    --header-sub: rgba(200,100,100,0.5);
+    --piece-panel-bg: rgba(80,0,0,0.25);
+    --piece-panel-border: rgba(139,0,0,0.3);
+    --piece-label-color: rgba(200,120,120,0.6);
+    --piece-count-color: #e08080;
+    --ai-info-color: rgba(180,80,80,0.5);
+    --menu-card-bg: rgba(60,0,0,0.35);
+    --menu-card-border: rgba(120,0,0,0.5);
+    --menu-card-color: #d4a0a0;
+    --menu-card-hover-bg: rgba(120,0,0,0.5);
+    --menu-card-sub: rgba(180,100,100,0.55);
+    --tut-slide-color: #bfa0a0;
+    --tut-h4-color: #cc4444;
+    --box-h3-color: #dd5555;
+    --box-sub-color: rgba(200,130,130,0.6);
+    --box-dot-bg: rgba(139,0,0,0.25);
+    --box-tip-color: #cc7777;
+    --box-warn-color: #cc9955;
+    --box-step-label: rgba(200,100,100,0.4);
+    --box-close-color: rgba(200,100,100,0.4);
+    --replay-upload-border: rgba(139,0,0,0.35);
+    --replay-upload-color: rgba(200,120,120,0.55);
+    --replay-info-color: rgba(200,140,140,0.7);
+    --replay-nav-color: #d4a0a0;
+}
+
+/* 호러 배경 — 핏방울·얼룩 강화 */
+body.theme-horror::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+        /* 왼쪽 위 큰 핏자국 */
+        radial-gradient(ellipse 55% 40% at 8% 12%, rgba(160,0,0,0.55) 0%, rgba(100,0,0,0.3) 35%, transparent 65%),
+        /* 오른쪽 아래 번짐 */
+        radial-gradient(ellipse 45% 55% at 92% 88%, rgba(120,0,10,0.5) 0%, rgba(80,0,0,0.25) 40%, transparent 65%),
+        /* 중앙 어두운 심연 */
+        radial-gradient(ellipse 60% 60% at 50% 50%, rgba(30,0,0,0.7) 0%, transparent 70%),
+        /* 오른쪽 위 작은 얼룩 */
+        radial-gradient(ellipse 25% 18% at 78% 8%, rgba(180,0,0,0.4) 0%, transparent 60%),
+        /* 왼쪽 아래 얼룩 */
+        radial-gradient(ellipse 30% 22% at 12% 85%, rgba(140,0,0,0.45) 0%, transparent 60%),
+        /* 배경 기본색 */
+        #050002;
+    animation: horrorPulse 4s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+body.theme-horror::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    /* 균열·노이즈 텍스처 느낌 */
+    background-image:
+        repeating-linear-gradient(
+            17deg,
+            transparent 0px, transparent 18px,
+            rgba(80,0,0,0.04) 18px, rgba(80,0,0,0.04) 19px
+        ),
+        repeating-linear-gradient(
+            -13deg,
+            transparent 0px, transparent 22px,
+            rgba(60,0,0,0.03) 22px, rgba(60,0,0,0.03) 23px
+        );
+    pointer-events: none;
+}
+@keyframes horrorPulse {
+    0%   { opacity: 0.75; }
+    100% { opacity: 1; }
+}
+
+/* 호러 카드: 핏빛 테두리 + 강한 그림자 */
+body.theme-horror #app-card {
+    border-color: rgba(180,0,0,0.6);
+    box-shadow: 0 0 60px rgba(139,0,0,0.5), 0 0 120px rgba(80,0,0,0.3), inset 0 0 40px rgba(80,0,0,0.15);
+    background: rgba(10,0,4,0.92);
+}
+body.theme-horror #app-header h1 {
+    letter-spacing: 0.08em;
+    color: #cc2222;
+    text-shadow: 0 0 10px rgba(255,0,0,0.8), 0 0 30px rgba(180,0,0,0.6), 0 0 60px rgba(100,0,0,0.4);
+    animation: horrorPulse 3s ease-in-out infinite alternate;
+}
+body.theme-horror button {
+    border-color: rgba(160,0,0,0.6);
+    background: rgba(60,0,0,0.45);
+    text-shadow: 0 0 8px rgba(200,50,50,0.4);
+}
+body.theme-horror .menu-card:hover {
+    box-shadow: 0 0 20px rgba(180,0,0,0.5), 0 0 40px rgba(100,0,0,0.3);
+    border-color: rgba(200,0,0,0.7);
+    transform: translateY(-2px);
+}
+body.theme-horror #status.turn-p1 {
+    background: rgba(0,40,100,0.35);
+    border-color: rgba(0,100,200,0.5);
+}
+body.theme-horror #status.turn-p2 {
+    background: rgba(120,0,0,0.4);
+    border-color: rgba(220,0,0,0.6);
+    box-shadow: 0 0 12px rgba(180,0,0,0.4);
+    animation: horrorPulse 1.5s ease-in-out infinite alternate;
+}
+body.theme-horror #tutorial-box,
+body.theme-horror #replay-box {
+    background: rgba(8,0,4,0.96);
+    border-color: rgba(160,0,0,0.5);
+    box-shadow: 0 0 40px rgba(139,0,0,0.3), 0 8px 32px rgba(0,0,0,0.8);
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--body-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 12px 40px;
+    color: var(--body-color);
+    position: relative;
+    overflow-x: hidden;
+    transition: background 0.4s;
+}
+
+/* 기본: pseudo-element 없음 */
+body::before, body::after { content: none; }
+
+/* 사이버 배경 레이어 — 매트릭스 그린 오버레이 */
+body.theme-cyber::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,40,0,0.6) 0%, transparent 70%),
+        #000800;
+    pointer-events: none;
+}
+body.theme-cyber::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+        linear-gradient(rgba(0,255,70,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,70,0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+}
+/* 매트릭스 캔버스 */
+#matrix-canvas {
+    position: fixed; top: 0; left: 0; z-index: 0;
+    pointer-events: none;
+    display: none;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    margin: 0 !important;
+    max-width: none !important;
+}
+body.theme-cyber #matrix-canvas { display: block; }
+/* 호러 피 흘러내리기 캔버스 */
+#blood-canvas {
+    position: fixed; top: 0; left: 0; z-index: 0;
+    pointer-events: none;
+    display: none;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    margin: 0 !important;
+    max-width: none !important;
+}
+body.theme-horror #blood-canvas { display: block; }
+@keyframes bgPulse {
+    0%   { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+#app-card { position: relative; z-index: 1; }
+
+/* ── 메인 카드 ── */
+#app-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 28px 28px 32px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: var(--card-shadow);
+    text-align: center;
+    transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+}
+
+/* ── 헤더 ── */
+#app-header { margin-bottom: 20px; }
+#app-header h1 {
+    font-size: 1.5em; font-weight: 700; letter-spacing: 0.03em;
+    color: var(--header-h1); margin-bottom: 4px;
+}
+#app-header p {
+    font-size: 0.78em; color: var(--header-sub); letter-spacing: 0.08em;
+}
+
+/* ── 말 개수 표시 패널 (게임 중) ── */
+#piece-panel {
+    display: none; justify-content: space-between; align-items: center;
+    background: var(--piece-panel-bg);
+    border-radius: 12px; padding: 10px 18px; margin-bottom: 14px;
+    border: 1px solid var(--piece-panel-border);
+}
+#piece-panel.visible { display: flex; }
+.piece-info { display: flex; align-items: center; gap: 8px; font-size: 0.88em; font-weight: 600; }
+.piece-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(128,128,128,0.4); }
+.piece-dot.blue { background: #3498db; }
+.piece-dot.red  { background: #e74c3c; }
+.piece-count { font-size: 1.1em; font-weight: 700; color: var(--piece-count-color); }
+.piece-label { font-size: 0.75em; color: var(--piece-label-color); }
+
+/* ── 상태 표시 ── */
+#status-wrap {
+    margin-bottom: 12px;
+    min-height: 38px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+#status {
+    display: inline-block;
+    font-size: 1em;
+    font-weight: 700;
+    padding: 6px 20px;
+    border-radius: 20px;
+    background: var(--status-bg);
+    border: 1px solid var(--status-border);
+    color: var(--status-color);
+    min-width: 180px;
+    transition: background 0.3s, border-color 0.3s;
+}
+#status.turn-p1 { background: rgba(52,152,219,0.2); border-color: rgba(52,152,219,0.5); }
+#status.turn-p2 { background: rgba(231,76,60,0.2);  border-color: rgba(231,76,60,0.5); }
+#status.turn-warn { background: rgba(241,196,15,0.2); border-color: rgba(241,196,15,0.6); }
+#ai-info { font-size: 0.75em; color: var(--ai-info-color); min-height: 1em; }
+#draw-counter {
+    display: inline-block;
+    font-size: 0.78em; font-weight: 600;
+    padding: 3px 12px; border-radius: 12px;
+    background: rgba(255,193,7,0.15);
+    border: 1px solid rgba(255,193,7,0.4);
+    color: #ffc107;
+}
+#draw-counter.hidden { display: none !important; }
+#draw-counter.warn {
+    background: rgba(231,76,60,0.2);
+    border-color: rgba(231,76,60,0.5);
+    color: #e74c3c;
+}
+
+/* ── 캔버스 ── */
+canvas {
+    border-radius: 16px;
+    border: var(--canvas-border);
+    box-shadow: var(--canvas-shadow);
+    background: var(--canvas-bg);
+    display: block;
+    margin: 0 auto 16px;
+    max-width: 100%;
+    transition: background 0.4s, border-color 0.4s;
+}
+
+/* ── 메뉴 버튼 영역 ── */
+#menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+button {
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.88em;
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--btn-color);
+    transition: all 0.18s;
+    letter-spacing: 0.01em;
+}
+button:hover:not(:disabled) {
+    background: var(--btn-hover-bg);
+    border-color: var(--btn-border);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+button:disabled { opacity: 0.35; cursor: default; transform: none; }
+
+/* 메인 메뉴 큰 버튼 카드 */
+.menu-card {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 1px solid var(--menu-card-border);
+    background: var(--menu-card-bg);
+    cursor: pointer; color: var(--menu-card-color);
+    font-family: inherit; font-weight: 600;
+    transition: all 0.18s; min-width: 110px;
+}
+.menu-card:hover { background: var(--menu-card-hover-bg); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+.menu-card .card-icon { font-size: 1.8em; margin-bottom: 2px; }
+.menu-card .card-label { font-size: 0.82em; }
+.menu-card .card-sub { font-size: 0.7em; color: var(--menu-card-sub); }
+
+/* 난이도 선택 버튼 */
+.diff-btn {
+    padding: 10px 22px; border-radius: 10px; font-size: 0.9em;
+    cursor: pointer; font-family: inherit; font-weight: 700;
+    border: 2px solid; transition: all 0.18s; color: #fff;
+}
+.diff-easy  { background: rgba(39,174,96,0.2);  border-color: #27ae60; }
+.diff-hard  { background: rgba(231,76,60,0.2);  border-color: #e74c3c; }
+.diff-aivai { background: rgba(142,68,173,0.2); border-color: #8e44ad; }
+.diff-btn:hover { filter: brightness(1.3); transform: translateY(-1px); }
+
+/* 무르기 버튼 */
+#undo-btn {
+    background: rgba(243,156,18,0.2);
+    border-color: rgba(243,156,18,0.6);
+    color: #f39c12;
+}
+#undo-btn:hover:not(:disabled) { background: rgba(243,156,18,0.35); }
+
+/* ── Blink 애니메이션 ── */
+.blink { animation: blinker 0.9s ease-in-out infinite; }
+@keyframes blinker { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
+
+/* ── 튜토리얼 오버레이 ── */
+#tutorial-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.7); z-index:100;
+    justify-content:center; align-items:center;
+    padding: 16px;
+}
+#tutorial-overlay.show { display:flex; }
+#tutorial-box {
+    background: var(--box-bg);
+    border: 1px solid var(--card-border);
+    border-radius:18px;
+    padding:28px 28px; max-width:500px; width:100%;
+    max-height:90vh; overflow-y:auto;
+    text-align:left; position:relative;
+    box-shadow:0 16px 48px rgba(0,0,0,0.4);
+    color: var(--box-color);
+    transition: background 0.4s;
+}
+#tutorial-box h3 { text-align:center; font-size:1.15em; margin:0 0 4px; color:var(--box-h3-color); }
+#tutorial-box .tut-sub { text-align:center; font-size:0.82em; color:var(--box-sub-color); margin-bottom:16px; }
+#tut-dots { display:flex; justify-content:center; gap:7px; margin-bottom:18px; }
+.tut-dot { width:9px; height:9px; border-radius:50%; background:var(--box-dot-bg); transition:background .2s; cursor:pointer; }
+.tut-dot.active { background:#3498db; }
+.tut-slide { display:none; }
+.tut-slide.active { display:block; }
+.tut-slide h4 { font-size:1em; color:var(--tut-h4-color); margin:0 0 10px; }
+.tut-slide p, .tut-slide li { font-size:0.87em; line-height:1.8; color:var(--tut-slide-color); margin:5px 0; }
+.tut-slide ul { padding-left:18px; }
+.tut-tip  { background:rgba(52,152,219,0.1); border-left:3px solid #3498db; border-radius:0 6px 6px 0; padding:8px 12px; margin-top:10px; font-size:0.83em; color:var(--box-tip-color); }
+.tut-warn { background:rgba(241,196,15,0.08); border-left:3px solid #f1c40f; border-radius:0 6px 6px 0; padding:8px 12px; margin-top:10px; font-size:0.83em; color:var(--box-warn-color); }
+#tut-nav  { display:flex; justify-content:space-between; align-items:center; margin-top:18px; }
+#tut-nav button { padding:7px 18px; font-size:0.88em; }
+#tut-step-label { font-size:0.8em; color:var(--box-step-label); }
+#tut-close { position:absolute; top:14px; right:18px; background:none; border:none; font-size:1.4em; cursor:pointer; color:var(--box-close-color); line-height:1; padding:0; }
+#tut-close:hover { color:var(--box-h3-color); background:none; }
+
+/* ── 리플레이 오버레이 ── */
+#replay-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.75); z-index:200;
+    justify-content:center; align-items:center;
+    padding: 16px;
+}
+#replay-overlay.show { display:flex; }
+#replay-box {
+    background: var(--box-bg);
+    border: 1px solid var(--card-border);
+    border-radius:18px;
+    padding:24px 24px; max-width:480px; width:100%;
+    text-align:center; position:relative;
+    box-shadow:0 16px 48px rgba(0,0,0,0.4);
+    color: var(--box-color);
+    max-height: 90vh; overflow-y: auto;
+    transition: background 0.4s;
+}
+#replay-box h3 { font-size:1.1em; margin:0 0 14px; color:var(--box-h3-color); }
+#replay-upload-area {
+    border:2px dashed var(--replay-upload-border); border-radius:12px;
+    padding:32px 16px; color:var(--replay-upload-color); font-size:0.92em; margin-bottom:14px;
+    transition:border-color 0.2s, background 0.2s;
+}
+#replay-upload-area:hover { border-color:#16a085; background:rgba(22,160,133,0.08); color:#16a085; }
+#replay-file-input { display:none; }
+#replay-controls { display:none; }
+#replay-info {
+    font-size:0.83em; color:var(--replay-info-color); margin-bottom:10px; min-height:1.4em;
+    padding: 6px 12px; background: rgba(0,0,0,0.2); border-radius: 8px;
+}
+#replay-nav {
+    display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap;
+    margin-top: 10px;
+}
+#replay-nav button {
+    padding:7px 14px; font-size:0.9em; border-radius:8px;
+    border:1px solid var(--btn-border); background:var(--btn-bg);
+    color:var(--btn-color); cursor:pointer; font-weight:700;
+}
+#replay-nav button:hover:not(:disabled) { background:var(--btn-hover-bg); }
+#replay-nav button:disabled { opacity:0.3; cursor:default; }
+#replay-progress {
+    width:100%; height:6px; background:var(--piece-panel-border); border-radius:3px;
+    margin:12px 0 4px; cursor:pointer;
+}
+#replay-progress-fill { height:100%; background:#16a085; border-radius:3px; transition:width 0.15s; }
+#replay-close { position:absolute; top:14px; right:18px; background:none; border:none; font-size:1.4em; cursor:pointer; color:var(--box-close-color); padding:0; line-height:1; }
+#replay-close:hover { color:var(--box-h3-color); background:none; }
+#replay-canvas { border-radius:12px; border:var(--canvas-border) !important; box-shadow:var(--canvas-shadow); background:var(--canvas-bg) !important; }
+
+/* ── 테마 선택 모달 ── */
+#theme-modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.65); z-index:300;
+    justify-content:center; align-items:center; padding:16px;
+}
+#theme-modal-overlay.show { display:flex; }
+#theme-modal {
+    background:var(--box-bg); color:var(--box-color);
+    border:1px solid var(--card-border); border-radius:18px;
+    padding:28px 28px 24px; max-width:420px; width:100%;
+    box-shadow:0 16px 48px rgba(0,0,0,0.4); position:relative; text-align:center;
+}
+#theme-modal h3 { font-size:1.1em; font-weight:700; margin-bottom:20px; color:var(--box-h3-color); }
+.theme-options { display:flex; flex-direction:column; gap:10px; }
+.theme-option-btn {
+    display:flex; align-items:center; gap:14px;
+    padding:14px 18px; border-radius:12px; cursor:pointer;
+    border:2px solid var(--btn-border); background:var(--btn-bg);
+    color:var(--btn-color); font-family:inherit; font-size:0.95em; font-weight:600;
+    transition:all 0.15s; text-align:left;
+}
+.theme-option-btn:hover { transform:translateX(4px); }
+.theme-option-btn.active { border-color:#16a085; box-shadow:0 0 0 2px rgba(22,160,133,0.3); }
+.theme-option-btn.active::after { content:'✓'; margin-left:auto; color:#16a085; font-weight:700; }
+.theme-swatch {
+    width:36px; height:36px; border-radius:8px; flex-shrink:0;
+    border:2px solid rgba(0,0,0,0.12); display:flex; align-items:center; justify-content:center;
+    font-size:1.2em;
+}
+.theme-option-info { display:flex; flex-direction:column; gap:2px; }
+.theme-option-name { font-weight:700; font-size:0.95em; }
+.theme-option-desc { font-size:0.75em; color:var(--box-sub-color); font-weight:400; }
+#theme-modal-close {
+    position:absolute; top:14px; right:18px;
+    background:none; border:none; font-size:1.4em;
+    cursor:pointer; color:var(--box-close-color); padding:0; line-height:1;
+}
+#theme-modal-close:hover { color:var(--box-h3-color); background:none; }
+</style>
+</head>
+<body>
+<canvas id="matrix-canvas"></canvas>
+<canvas id="blood-canvas"></canvas>
+<div id="app-card">
+
+  <!-- 헤더 -->
+  <div id="app-header">
+    <h1>♟ Nine Men's Morris</h1>
+    <p>AI MATH CREATION</p>
+    <button id="theme-btn" onclick="openThemeModal()"
+      style="margin-top:10px;font-size:0.75em;padding:5px 14px;border-radius:20px;
+             background:var(--theme-btn-bg);color:var(--theme-btn-color);
+             border:1px solid currentColor;letter-spacing:0.05em;">
+      🎨 테마 선택
+    </button>
+  </div>
+
+  <!-- 게임 중 말 개수 패널 -->
+  <div id="piece-panel">
+    <div class="piece-info">
+      <div class="piece-dot blue"></div>
+      <div>
+        <div class="piece-count" id="p1-count">9</div>
+        <div class="piece-label">파랑 남은 말</div>
+      </div>
+    </div>
+    <div style="font-size:0.75em;color:rgba(255,255,255,0.25);">VS</div>
+    <div class="piece-info">
+      <div>
+        <div class="piece-count" id="p2-count">9</div>
+        <div class="piece-label">빨강 남은 말</div>
+      </div>
+      <div class="piece-dot red"></div>
+    </div>
+  </div>
+
+  <!-- 상태 표시 -->
+  <div id="status-wrap">
+    <div id="status">모드를 선택하여 시작하세요.</div>
+    <div id="ai-info"></div>
+    <span id="draw-counter" class="hidden"></span>
+  </div>
+
+  <!-- 메뉴 -->
+  <div id="menu">
+    <button class="menu-card" onclick="showAIMenu()">
+      <span class="card-icon">🤖</span>
+      <span class="card-label">AI 모드</span>
+      <span class="card-sub">vs AI</span>
+    </button>
+    <button class="menu-card" onclick="startGame('pvp',1)">
+      <span class="card-icon">🎮</span>
+      <span class="card-label">PVP 모드</span>
+      <span class="card-sub">2인 대전</span>
+    </button>
+    <button class="menu-card" onclick="showTutorial()">
+      <span class="card-icon">📖</span>
+      <span class="card-label">게임 규칙</span>
+      <span class="card-sub">튜토리얼</span>
+    </button>
+    <button class="menu-card" onclick="showReplay()">
+      <span class="card-icon">🎬</span>
+      <span class="card-label">다시보기</span>
+      <span class="card-sub">CSV 재생</span>
+    </button>
+  </div>
+
+  <!-- 보드 캔버스 -->
+  <canvas id="board" width="500" height="500"></canvas>
+
+</div>
+
+<!-- ─── 테마 선택 모달 ─── -->
+<div id="theme-modal-overlay">
+ <div id="theme-modal">
+  <button id="theme-modal-close" onclick="closeThemeModal()">✕</button>
+  <h3>🎨 테마 선택</h3>
+  <div class="theme-options">
+   <button class="theme-option-btn active" id="theme-opt-classic" onclick="selectTheme('classic')">
+    <div class="theme-swatch" style="background:#ffffff;"></div>
+    <div class="theme-option-info">
+     <span class="theme-option-name">클래식</span>
+     <span class="theme-option-desc">깔끔한 흰 배경의 기본 테마</span>
+    </div>
+   </button>
+   <button class="theme-option-btn" id="theme-opt-bauhaus" onclick="selectTheme('bauhaus')">
+    <div class="theme-swatch" style="background:linear-gradient(135deg,#D62828 33%,#FFDD00 33%,#FFDD00 66%,#003F88 66%);">　</div>
+    <div class="theme-option-info">
+     <span class="theme-option-name">바우하우스</span>
+     <span class="theme-option-desc">원색·직선·기하학의 1919년 디자인</span>
+    </div>
+   </button>
+   <button class="theme-option-btn" id="theme-opt-cyber" onclick="selectTheme('cyber')">
+    <div class="theme-swatch" style="background:#0a0f1e;border-color:#00c8ff;">⚡</div>
+    <div class="theme-option-info">
+     <span class="theme-option-name">사이버</span>
+     <span class="theme-option-desc">네온 글로우의 디지털 미래 테마</span>
+    </div>
+   </button>
+   <button class="theme-option-btn" id="theme-opt-horror" onclick="selectTheme('horror')">
+    <div class="theme-swatch" style="background:#120008;border-color:#8B0000;">🩸</div>
+    <div class="theme-option-info">
+     <span class="theme-option-name">호러</span>
+     <span class="theme-option-desc">핏빛 얼룩과 공포의 어둠</span>
+    </div>
+   </button>
+   <button class="theme-option-btn" id="theme-opt-claymorphism" onclick="selectTheme('claymorphism')">
+    <div class="theme-swatch" style="background:linear-gradient(135deg,#e8d0ff,#d0e8ff);border-color:rgba(180,160,220,0.5);box-shadow:0 4px 0 rgba(160,130,210,0.3);">🫧</div>
+    <div class="theme-option-info">
+     <span class="theme-option-name">클레이모피즘</span>
+     <span class="theme-option-desc">부드러운 점토 파스텔 테마</span>
+    </div>
+   </button>
+  </div>
+ </div>
+</div>
+
+<!-- ─── 튜토리얼 오버레이 ─── -->
+<div id="tutorial-overlay">
+ <div id="tutorial-box">
+  <button id="tut-close" onclick="closeTutorial()">✕</button>
+  <h3>📖 게임 규칙 설명</h3>
+  <p class="tut-sub">Nine Men's Morris (구멍아홉말)</p>
+  <div id="tut-dots"></div>
+
+  <!-- 슬라이드 0: 게임 소개 -->
+  <div class="tut-slide active">
+   <h4>🎯 이 게임이 뭐예요?</h4>
+   <p>Nine Men's Morris는 <strong>3,000년이 넘은</strong> 고전 보드게임이에요. 고대 이집트, 로마에서도 즐겼답니다!</p>
+   <p>두 명이 각각 <strong>파란 말</strong>과 <strong>빨간 말</strong> 9개씩으로 싸우는 전략 게임이에요.</p>
+   <svg viewBox="-5 -5 240 100" style="width:100%;display:block;margin:10px auto;overflow:visible;">
+     <rect x="10" y="10" width="70" height="70" rx="4" fill="none" stroke="#bbb" stroke-width="1.5"/>
+     <rect x="28" y="28" width="34" height="34" rx="2" fill="none" stroke="#bbb" stroke-width="1.5"/>
+     <line x1="45" y1="10" x2="45" y2="28" stroke="#bbb" stroke-width="1.5"/>
+     <line x1="45" y1="62" x2="45" y2="80" stroke="#bbb" stroke-width="1.5"/>
+     <line x1="10" y1="45" x2="28" y2="45" stroke="#bbb" stroke-width="1.5"/>
+     <line x1="62" y1="45" x2="80" y2="45" stroke="#bbb" stroke-width="1.5"/>
+     <circle cx="45" cy="10" r="8" fill="#3498db"/><circle cx="80" cy="10" r="8" fill="#3498db"/>
+     <circle cx="10" cy="45" r="8" fill="#3498db"/><circle cx="10" cy="80" r="8" fill="#e74c3c"/>
+     <circle cx="45" cy="80" r="8" fill="#e74c3c"/><circle cx="80" cy="45" r="8" fill="#e74c3c"/>
+     <text x="100" y="22" font-size="11" fill="#444" font-family="Arial">각자 말 9개씩</text>
+     <text x="100" y="40" font-size="11" fill="#3498db" font-family="Arial">● 파란 말 (나)</text>
+     <text x="100" y="57" font-size="11" fill="#e74c3c" font-family="Arial">● 빨간 말 (상대)</text>
+     <text x="100" y="74" font-size="10" fill="#888" font-family="Arial">번갈아 놓기</text>
+   </svg>
+   <div class="tut-tip">🏆 상대 말을 <strong>2개 이하</strong>로 줄이거나, 상대가 <strong>이동 못 하게</strong> 되면 승리!</div>
+  </div>
+
+  <!-- 슬라이드 1: 보드 구조 -->
+  <div class="tut-slide">
+   <h4>🗺️ 보드는 어떻게 생겼나요?</h4>
+   <p>3개의 정사각형이 겹쳐진 모양이에요. <strong>24개 점</strong>에 말을 놓을 수 있어요.</p>
+   <svg viewBox="-5 -5 240 240" style="width:100%;max-width:230px;display:block;margin:8px auto;overflow:visible;">
+     <rect x="5" y="5" width="210" height="210" rx="3" fill="none" stroke="#e74c3c" stroke-width="2.5"/>
+     <rect x="45" y="45" width="130" height="130" rx="3" fill="none" stroke="#f39c12" stroke-width="2.5"/>
+     <rect x="85" y="85" width="50" height="50" rx="3" fill="none" stroke="#3498db" stroke-width="2.5"/>
+     <line x1="110" y1="5" x2="110" y2="85" stroke="#999" stroke-width="1.5"/>
+     <line x1="110" y1="135" x2="110" y2="215" stroke="#999" stroke-width="1.5"/>
+     <line x1="5" y1="110" x2="85" y2="110" stroke="#999" stroke-width="1.5"/>
+     <line x1="135" y1="110" x2="215" y2="110" stroke="#999" stroke-width="1.5"/>
+     <!-- 바깥 점 -->
+     <circle cx="5" cy="5" r="5" fill="#e74c3c"/><circle cx="110" cy="5" r="5" fill="#e74c3c"/><circle cx="215" cy="5" r="5" fill="#e74c3c"/>
+     <circle cx="215" cy="110" r="5" fill="#e74c3c"/><circle cx="215" cy="215" r="5" fill="#e74c3c"/>
+     <circle cx="110" cy="215" r="5" fill="#e74c3c"/><circle cx="5" cy="215" r="5" fill="#e74c3c"/><circle cx="5" cy="110" r="5" fill="#e74c3c"/>
+     <!-- 중간 점 -->
+     <circle cx="45" cy="45" r="5" fill="#f39c12"/><circle cx="110" cy="45" r="5" fill="#f39c12"/><circle cx="175" cy="45" r="5" fill="#f39c12"/>
+     <circle cx="175" cy="110" r="5" fill="#f39c12"/><circle cx="175" cy="175" r="5" fill="#f39c12"/>
+     <circle cx="110" cy="175" r="5" fill="#f39c12"/><circle cx="45" cy="175" r="5" fill="#f39c12"/><circle cx="45" cy="110" r="5" fill="#f39c12"/>
+     <!-- 안쪽 점 -->
+     <circle cx="85" cy="85" r="5" fill="#3498db"/><circle cx="110" cy="85" r="5" fill="#3498db"/><circle cx="135" cy="85" r="5" fill="#3498db"/>
+     <circle cx="135" cy="110" r="5" fill="#3498db"/><circle cx="135" cy="135" r="5" fill="#3498db"/>
+     <circle cx="110" cy="135" r="5" fill="#3498db"/><circle cx="85" cy="135" r="5" fill="#3498db"/><circle cx="85" cy="110" r="5" fill="#3498db"/>
+     <!-- 라벨 -->
+     <text x="118" y="4" font-size="9" fill="#e74c3c" font-family="Arial" font-weight="bold">바깥 (1~8)</text>
+     <text x="118" y="44" font-size="9" fill="#f39c12" font-family="Arial" font-weight="bold">가운데 (9~16)</text>
+     <text x="140" y="85" font-size="8.5" fill="#3498db" font-family="Arial" font-weight="bold">안쪽(17~24)</text>
+   </svg>
+   <div class="tut-tip">💡 말은 <strong>선으로 연결된 바로 옆</strong>으로만 이동해요!</div>
+  </div>
+
+  <!-- 슬라이드 2: 1단계 놓기 -->
+  <div class="tut-slide">
+   <h4>1️⃣ 1단계: 말 놓기 (Placing)</h4>
+   <p>게임은 <strong>3단계</strong>로 진행돼요. 첫 번째는 말 놓기예요.</p>
+   <svg viewBox="-12 -12 260 140" style="width:100%;display:block;margin:8px auto;overflow:visible;">
+     <rect x="5" y="5" width="115" height="115" rx="3" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <rect x="28" y="28" width="69" height="69" rx="3" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="62" y1="5" x2="62" y2="28" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="62" y1="97" x2="62" y2="120" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="5" y1="62" x2="28" y2="62" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="97" y1="62" x2="120" y2="62" stroke="#ccc" stroke-width="1.5"/>
+     <circle cx="62" cy="5" r="10" fill="#3498db"/>
+     <circle cx="120" cy="62" r="10" fill="#3498db"/>
+     <circle cx="5" cy="5" r="10" fill="#e74c3c"/>
+     <circle cx="5" cy="120" r="10" fill="#e74c3c"/>
+     <circle cx="120" cy="5" r="5" fill="#bbb"/><circle cx="120" cy="120" r="5" fill="#bbb"/>
+     <circle cx="62" cy="120" r="5" fill="#bbb"/><circle cx="5" cy="62" r="5" fill="#bbb"/>
+     <circle cx="28" cy="28" r="5" fill="#bbb"/><circle cx="62" cy="28" r="5" fill="#bbb"/><circle cx="97" cy="28" r="5" fill="#bbb"/>
+     <circle cx="97" cy="62" r="5" fill="#bbb"/>
+     <circle cx="97" cy="97" r="5" fill="#bbb"/><circle cx="62" cy="97" r="5" fill="#bbb"/><circle cx="28" cy="97" r="5" fill="#bbb"/>
+     <circle cx="28" cy="62" r="5" fill="#bbb"/>
+     <text x="140" y="22" font-size="11" fill="#444" font-family="Arial">빈 자리에</text>
+     <text x="140" y="38" font-size="11" fill="#444" font-family="Arial">번갈아 1개씩</text>
+     <text x="140" y="60" font-size="11" fill="#3498db" font-family="Arial">● 파랑 2개</text>
+     <text x="140" y="77" font-size="11" fill="#e74c3c" font-family="Arial">● 빨강 2개</text>
+     <text x="140" y="98" font-size="10" fill="#888" font-family="Arial">9개씩 다 놓을 때까지</text>
+   </svg>
+   <div class="tut-warn">⚠️ 이 단계에서는 이동 안 돼요. 빈 자리에 놓기만!</div>
+  </div>
+
+  <!-- 슬라이드 3: 밀(Mill) -->
+  <div class="tut-slide">
+   <h4>✨ "밀(Mill)"이 뭐예요?</h4>
+   <p>같은 색 말 <strong>3개가 일직선</strong>으로 늘어서면 "밀" 완성! 상대 말 1개를 <strong>즉시 제거</strong>할 수 있어요.</p>
+   <svg viewBox="-12 -14 270 150" style="width:100%;display:block;margin:8px auto;overflow:visible;">
+     <rect x="5" y="5" width="125" height="125" rx="3" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <rect x="28" y="28" width="79" height="79" rx="3" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="67" y1="5" x2="67" y2="28" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="67" y1="107" x2="67" y2="130" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="5" y1="67" x2="28" y2="67" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="107" y1="67" x2="130" y2="67" stroke="#ccc" stroke-width="1.5"/>
+     <!-- 밀 강조선 -->
+     <line x1="5" y1="5" x2="130" y2="5" stroke="#3498db" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+     <!-- 밀 말 3개 -->
+     <circle cx="5" cy="5" r="11" fill="#3498db"/><text x="5" y="9" text-anchor="middle" font-size="10" fill="white" font-family="Arial">✓</text>
+     <circle cx="67" cy="5" r="11" fill="#3498db"/><text x="67" y="9" text-anchor="middle" font-size="10" fill="white" font-family="Arial">✓</text>
+     <circle cx="130" cy="5" r="11" fill="#3498db"/><text x="130" y="9" text-anchor="middle" font-size="10" fill="white" font-family="Arial">✓</text>
+     <!-- 기타 말 -->
+     <circle cx="130" cy="67" r="10" fill="#3498db" opacity="0.4"/>
+     <circle cx="5" cy="67" r="10" fill="#e74c3c"/>
+     <circle cx="5" cy="130" r="10" fill="#e74c3c"/>
+     <circle cx="67" cy="130" r="10" fill="#e74c3c"/>
+     <circle cx="130" cy="130" r="5" fill="#bbb"/>
+     <circle cx="28" cy="28" r="5" fill="#bbb"/><circle cx="67" cy="28" r="5" fill="#bbb"/><circle cx="107" cy="28" r="5" fill="#bbb"/>
+     <circle cx="107" cy="67" r="5" fill="#bbb"/>
+     <circle cx="107" cy="107" r="5" fill="#bbb"/><circle cx="67" cy="107" r="5" fill="#bbb"/><circle cx="28" cy="107" r="5" fill="#bbb"/>
+     <circle cx="28" cy="67" r="5" fill="#bbb"/>
+     <!-- 제거 화살표 -->
+     <text x="152" y="45" font-size="22" fill="#e74c3c" font-family="Arial">→</text>
+     <circle cx="218" cy="38" r="15" fill="#e74c3c" opacity="0.2" stroke="#e74c3c" stroke-width="2" stroke-dasharray="3,2"/>
+     <text x="218" y="44" text-anchor="middle" font-size="17" fill="#e74c3c" font-family="Arial">✕</text>
+     <text x="152" y="70" font-size="10" fill="#555" font-family="Arial">저 말을</text>
+     <text x="152" y="84" font-size="10" fill="#555" font-family="Arial">제거!</text>
+     <text x="20" y="120" font-size="9.5" fill="#3498db" font-family="Arial" font-weight="bold">밀 완성!</text>
+   </svg>
+   <ul style="margin-top:4px">
+    <li>밀 안 상대 말은 제거 불가 (다른 말 없으면 예외)</li>
+    <li>깼다가 <strong>다시 만드는 전략</strong>도 있어요!</li>
+   </ul>
+  </div>
+
+  <!-- 슬라이드 4: 이동 단계 -->
+  <div class="tut-slide">
+   <h4>2️⃣ 2단계: 말 이동 (Moving)</h4>
+   <p>9개씩 모두 놓으면 이동 단계로 바뀌어요.</p>
+   <svg viewBox="-12 -14 270 150" style="width:100%;display:block;margin:8px auto;overflow:visible;">
+     <rect x="5" y="5" width="125" height="125" rx="3" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <rect x="28" y="28" width="79" height="79" rx="3" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="67" y1="5" x2="67" y2="28" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="67" y1="107" x2="67" y2="130" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="5" y1="67" x2="28" y2="67" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="107" y1="67" x2="130" y2="67" stroke="#ccc" stroke-width="1.5"/>
+     <!-- 선택된 말 -->
+     <circle cx="67" cy="5" r="15" fill="none" stroke="#f1c40f" stroke-width="3"/>
+     <circle cx="67" cy="5" r="10" fill="#3498db"/>
+     <!-- 이동 가능 -->
+     <circle cx="5" cy="5" r="9" fill="none" stroke="#2ecc71" stroke-width="2.5" stroke-dasharray="3,2"/>
+     <circle cx="130" cy="5" r="9" fill="none" stroke="#2ecc71" stroke-width="2.5" stroke-dasharray="3,2"/>
+     <circle cx="67" cy="28" r="9" fill="none" stroke="#2ecc71" stroke-width="2.5" stroke-dasharray="3,2"/>
+     <!-- 기타 말 -->
+     <circle cx="130" cy="67" r="10" fill="#3498db" opacity="0.4"/>
+     <circle cx="5" cy="67" r="10" fill="#e74c3c"/>
+     <circle cx="5" cy="130" r="10" fill="#e74c3c"/>
+     <circle cx="130" cy="130" r="5" fill="#bbb"/><circle cx="67" cy="130" r="5" fill="#bbb"/>
+     <circle cx="28" cy="28" r="5" fill="#bbb"/><circle cx="107" cy="28" r="5" fill="#bbb"/>
+     <circle cx="107" cy="67" r="5" fill="#bbb"/><circle cx="28" cy="67" r="5" fill="#bbb"/>
+     <circle cx="107" cy="107" r="5" fill="#bbb"/><circle cx="67" cy="107" r="5" fill="#bbb"/><circle cx="28" cy="107" r="5" fill="#bbb"/>
+     <text x="152" y="20" font-size="10.5" fill="#444" font-family="Arial">노란 테두리 =</text>
+     <text x="152" y="35" font-size="10.5" fill="#f1c40f" font-family="Arial" font-weight="bold">선택된 말</text>
+     <text x="152" y="60" font-size="10.5" fill="#2ecc71" font-family="Arial">점선 원 =</text>
+     <text x="152" y="75" font-size="10.5" fill="#2ecc71" font-family="Arial">이동 가능 자리</text>
+     <text x="152" y="97" font-size="9.5" fill="#888" font-family="Arial">(연결된 옆만 가능)</text>
+   </svg>
+   <div class="tut-tip">💡 말을 선택했다 취소하려면 다른 곳을 클릭!</div>
+  </div>
+
+  <!-- 슬라이드 5: 날기 (Flying) -->
+  <div class="tut-slide">
+   <h4>3️⃣ 3단계: 날기 (Flying)</h4>
+   <p>말이 딱 <strong>3개</strong>만 남으면 선 연결 무시하고 어디로든 점프!</p>
+   <svg viewBox="-12 -14 270 150" style="width:100%;display:block;margin:8px auto;overflow:visible;">
+     <defs><marker id="fly-arr2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#3498db"/></marker></defs>
+     <rect x="5" y="5" width="125" height="125" rx="3" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <rect x="28" y="28" width="79" height="79" rx="3" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="67" y1="5" x2="67" y2="28" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="67" y1="107" x2="67" y2="130" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="5" y1="67" x2="28" y2="67" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="107" y1="67" x2="130" y2="67" stroke="#ccc" stroke-width="1.5"/>
+     <!-- 파란 말 3개 (선택) -->
+     <circle cx="5" cy="5" r="14" fill="none" stroke="#f1c40f" stroke-width="3"/>
+     <circle cx="5" cy="5" r="10" fill="#3498db"/>
+     <circle cx="130" cy="67" r="10" fill="#3498db"/>
+     <circle cx="67" cy="130" r="10" fill="#3498db"/>
+     <!-- 빨간 말 -->
+     <circle cx="130" cy="5" r="10" fill="#e74c3c"/>
+     <circle cx="5" cy="130" r="10" fill="#e74c3c"/>
+     <circle cx="130" cy="130" r="10" fill="#e74c3c"/>
+     <!-- 화살표 (어느 방향으로든) -->
+     <line x1="15" y1="5" x2="55" y2="5" stroke="#3498db" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#fly-arr2)"/>
+     <line x1="8" y1="15" x2="60" y2="25" stroke="#3498db" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#fly-arr2)"/>
+     <line x1="5" y1="17" x2="5" y2="55" stroke="#3498db" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#fly-arr2)"/>
+     <text x="152" y="25" font-size="10.5" fill="#444" font-family="Arial">말 3개 남으면</text>
+     <text x="152" y="42" font-size="11" fill="#3498db" font-family="Arial" font-weight="bold">어디든 점프!</text>
+     <text x="152" y="60" font-size="10" fill="#888" font-family="Arial">선 연결 무시</text>
+     <text x="152" y="85" font-size="10" fill="#e74c3c" font-family="Arial">⚠️ 2개 이하 = 패배</text>
+   </svg>
+   <div class="tut-tip">🕊️ 역전의 기회! 하지만 말이 줄면 위험해요.</div>
+  </div>
+
+  <!-- 슬라이드 6: 승리/패배 조건 -->
+  <div class="tut-slide">
+   <h4>🏆 어떻게 이기나요?</h4>
+   <svg viewBox="0 0 260 100" style="width:100%;display:block;margin:8px auto;overflow:visible;">
+     <rect x="3" y="5" width="120" height="88" rx="7" fill="#eafaf1" stroke="#2ecc71" stroke-width="1.5"/>
+     <text x="63" y="23" text-anchor="middle" font-size="11" fill="#1a7a4a" font-family="Arial" font-weight="bold">승리 조건</text>
+     <text x="11" y="42" font-size="9.5" fill="#1a7a4a" font-family="Arial">⚔️ 상대 말을 2개 이하로</text>
+     <text x="11" y="60" font-size="9.5" fill="#1a7a4a" font-family="Arial">🔒 상대를 포위해서</text>
+     <text x="11" y="76" font-size="9.5" fill="#1a7a4a" font-family="Arial">   이동 못 하게 만들기</text>
+     <rect x="137" y="5" width="120" height="88" rx="7" fill="#fef0f0" stroke="#e74c3c" stroke-width="1.5"/>
+     <text x="197" y="23" text-anchor="middle" font-size="11" fill="#a93226" font-family="Arial" font-weight="bold">패배 조건</text>
+     <text x="145" y="42" font-size="9.5" fill="#a93226" font-family="Arial">💔 내 말이 2개 이하</text>
+     <text x="145" y="60" font-size="9.5" fill="#a93226" font-family="Arial">🚫 내가 이동할 곳이</text>
+     <text x="145" y="76" font-size="9.5" fill="#a93226" font-family="Arial">   전혀 없을 때</text>
+   </svg>
+   <div class="tut-tip">🧠 어려움 AI는 최대 <strong>8수 앞</strong>을 읽어요. 쉽지 않을 거예요!</div>
+  </div>
+
+  <!-- 슬라이드 7: 무승부 -->
+  <div class="tut-slide">
+   <h4>🤝 무승부는 언제 나오나요?</h4>
+   <p>이동 단계에서 <strong>50턴</strong> 동안 말 제거가 없으면 무승부예요!</p>
+   <svg viewBox="0 0 260 110" style="width:100%;display:block;margin:8px auto;overflow:visible;">
+     <text x="10" y="22" font-size="10.5" fill="#555" font-family="Arial">게임 중 화면에 이렇게 표시돼요:</text>
+     <!-- 배지 모양 -->
+     <rect x="10" y="32" width="240" height="30" rx="15" fill="#fff3cd" stroke="#ffc107" stroke-width="1.5"/>
+     <text x="130" y="52" text-anchor="middle" font-size="12" fill="#856404" font-family="Arial" font-weight="bold">교착 상태: 40 / 50턴</text>
+     <!-- 경고 배지 -->
+     <rect x="10" y="72" width="240" height="30" rx="15" fill="#f8d7da" stroke="#e74c3c" stroke-width="1.5"/>
+     <text x="130" y="92" text-anchor="middle" font-size="12" fill="#842029" font-family="Arial" font-weight="bold">교착 상태: 48 / 50턴 ⚠️</text>
+   </svg>
+   <ul>
+    <li>말 제거가 생기면 카운터가 <strong>0으로 리셋</strong>돼요</li>
+    <li>놓기 단계(Placing)는 카운트 안 해요</li>
+    <li>40턴 이상이면 빨간 경고색으로 바뀌어요</li>
+   </ul>
+  </div>
+
+  <!-- 슬라이드 8: 전략 팁 -->
+  <div class="tut-slide">
+   <h4>💡 이기는 전략 팁!</h4>
+   <svg viewBox="-10 -10 260 110" style="width:100%;display:block;margin:8px auto;overflow:visible;">
+     <rect x="5" y="5" width="95" height="95" rx="2" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <rect x="24" y="24" width="57" height="57" rx="2" fill="none" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="52" y1="5" x2="52" y2="24" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="52" y1="81" x2="52" y2="100" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="5" y1="52" x2="24" y2="52" stroke="#ccc" stroke-width="1.5"/>
+     <line x1="81" y1="52" x2="100" y2="52" stroke="#ccc" stroke-width="1.5"/>
+     <!-- 중점 강조 (★) -->
+     <circle cx="52" cy="5" r="12" fill="#f39c12"/><text x="52" y="9" text-anchor="middle" font-size="11" fill="white" font-family="Arial">★</text>
+     <circle cx="100" cy="52" r="12" fill="#f39c12"/><text x="100" y="56" text-anchor="middle" font-size="11" fill="white" font-family="Arial">★</text>
+     <circle cx="52" cy="100" r="12" fill="#f39c12"/><text x="52" y="104" text-anchor="middle" font-size="11" fill="white" font-family="Arial">★</text>
+     <circle cx="5" cy="52" r="12" fill="#f39c12"/><text x="5" y="56" text-anchor="middle" font-size="11" fill="white" font-family="Arial">★</text>
+     <!-- 코너 -->
+     <circle cx="5" cy="5" r="6" fill="#bbb"/><circle cx="100" cy="5" r="6" fill="#bbb"/>
+     <circle cx="5" cy="100" r="6" fill="#bbb"/><circle cx="100" cy="100" r="6" fill="#bbb"/>
+     <text x="118" y="20" font-size="11" fill="#f39c12" font-family="Arial" font-weight="bold">★ = 중점 자리</text>
+     <text x="118" y="37" font-size="10" fill="#555" font-family="Arial">여러 밀에 참여 가능!</text>
+     <text x="118" y="57" font-size="10" fill="#888" font-family="Arial">코너(●)보다</text>
+     <text x="118" y="72" font-size="10" fill="#888" font-family="Arial">훨씬 유리해요</text>
+   </svg>
+   <ul>
+    <li>🎯 <strong>변의 중점</strong>(2·4·6·8번 등)을 먼저 차지하세요!</li>
+    <li>🔄 <strong>이중 밀</strong> — 두 밀이 겹치면 매 턴 제거 가능!</li>
+    <li>🚫 상대 밀 완성 직전 자리를 <strong>먼저 막으세요</strong></li>
+    <li>👀 50턴 무승부 전에 결판을 내세요!</li>
+   </ul>
+   <div class="tut-tip">🎉 이제 준비 완료! AI를 이겨보세요 😊</div>
+  </div>
+
+  <div id="tut-nav">
+   <button onclick="tutPrev()" id="tut-prev-btn">◀ 이전</button>
+   <span id="tut-step-label">1 / 9</span>
+   <button onclick="tutNext()" id="tut-next-btn" style="background:#3498db;color:#fff;border-color:#2980b9;">다음 ▶</button>
+  </div>
+ </div>
+</div>
+
+<!-- ─── 리플레이 오버레이 ─── -->
+<div id="replay-overlay">
+ <div id="replay-box">
+  <button id="replay-close" onclick="closeReplay()">✕</button>
+  <h3>🎬 게임 다시보기</h3>
+
+  <!-- 업로드 전 화면 -->
+  <div id="replay-upload-area">
+   <div style="font-size:2em;margin-bottom:8px;">📂</div>
+   <div style="margin-bottom:14px;color:#666;">저장한 nmm_log.csv 파일을 불러오세요</div>
+   <button onclick="document.getElementById('replay-file-input').click()"
+     style="background:#16a085;color:#fff;border-color:#1a7a5e;padding:10px 28px;font-size:1em;">
+     파일 선택
+   </button>
+   <div style="font-size:0.8em;color:#bbb;margin-top:12px;">또는 파일을 여기에 드래그하세요</div>
+  </div>
+  <input type="file" id="replay-file-input" accept=".csv" onchange="loadReplayCSV(event)">
+
+  <!-- 로드 후 컨트롤 -->
+  <div id="replay-controls">
+   <div id="replay-info">준비 중...</div>
+   <canvas id="replay-canvas" width="400" height="400"
+     style="border:2px solid #333;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.1);display:block;margin:0 auto;"></canvas>
+   <div id="replay-progress" onclick="replaySeek(event)">
+    <div id="replay-progress-fill" style="width:0%"></div>
+   </div>
+   <div id="replay-nav">
+    <button onclick="replayFirst()" title="처음">⏮</button>
+    <button onclick="replayPrev()" id="rprev-btn" title="이전 (←)">◀</button>
+    <!-- 숫자 직접 입력으로 턴 이동 -->
+    <input id="replay-turn-input" type="number" min="0" value="0"
+      title="턴 번호 입력 후 Enter"
+      style="width:52px;text-align:center;font-size:0.95em;padding:4px 2px;
+             border:1px solid #ccc;border-radius:5px;"
+      onkeydown="if(event.key==='Enter') replayGoToInput()"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    <span id="replay-total-label" style="font-size:0.85em;color:#aaa;">/ 0</span>
+    <button onclick="replayNext()" id="rnext-btn" title="다음 (→)">▶</button>
+    <button onclick="replayLast()" title="끝">⏭</button>
+   </div>
+   <div style="font-size:0.78em;color:#bbb;margin-top:6px;">
+     ← → 방향키 · 숫자 입력 후 Enter로 해당 턴으로 이동
+   </div>
+   <button onclick="document.getElementById('replay-file-input').click()"
+     style="margin-top:10px;font-size:0.8em;padding:5px 14px;color:#16a085;border-color:#16a085;">
+     📂 다른 파일 불러오기
+   </button>
+  </div>
+ </div>
+</div>
+
+<script>
+const canvas = document.getElementById("board");
+const ctx = canvas.getContext("2d");
+
+const EMPTY = 0, P1 = 1, P2 = 2;
+
+let board = Array(24).fill(0);
+let currentPlayer = null, placed = {1:0,2:0}, phase = null, removingPlayer = null, selectedPiece = null;
+let mode = null, userSide = null;
+let gameOver = false;
+let gameLog = [];
+let noCaptureTurns = 0;
+// 무르기용 스냅샷 스택
+let historyStack = [];
+
+// 24개 교차점 좌표
+const p = [
+    [50,50],[250,50],[450,50],[450,250],[450,450],[250,450],[50,450],[50,250],
+    [150,150],[250,150],[350,150],[350,250],[350,350],[250,350],[150,350],[150,250],
+    [200,200],[250,200],[300,200],[300,250],[300,300],[250,300],[200,300],[200,250]
+];
+
+const lines = [
+    [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0],
+    [8,9],[9,10],[10,11],[11,12],[12,13],[13,14],[14,15],[15,8],
+    [16,17],[17,18],[18,19],[19,20],[20,21],[21,22],[22,23],[23,16],
+    [1,9],[9,17],[3,11],[11,19],[5,13],[13,21],[7,15],[15,23]
+];
+
+const mills = [
+    [0,1,2],[2,3,4],[4,5,6],[6,7,0],
+    [8,9,10],[10,11,12],[12,13,14],[14,15,8],
+    [16,17,18],[18,19,20],[20,21,22],[22,23,16],
+    [1,9,17],[3,11,19],[5,13,21],[7,15,23]
+];
+
+// 인접 노드 사전 계산
+const adj = Array.from({length: 24}, () => []);
+for (const [a, b] of lines) { adj[a].push(b); adj[b].push(a); }
+
+// ============================================================
+// [신규1] OPENING BOOK
+// 전략 근거:
+//  - 외곽 중점(1,3,5,7): 3개 밀에 참여 가능 → 가장 가치 높음
+//  - 방사형 교차점(9,11,13,15): 2개 링 + 방사형 밀 참여
+//  - 외곽 코너(0,2,4,6): 2개 밀 참여
+//  - 내부 중점(17,19,21,23): 내부 밀 + 방사형 밀
+//  - 피할 위치: 8,10,12,14,16,18,20,22 (1개 밀만 참여)
+//
+// 키: board 배열을 join('')한 문자열 (24자, 0/1/2)
+// 값: 추천 위치 인덱스 (0-based)
+//
+// P1/P2 대칭 활용: AI가 P1일 때는 P1↔P2 뒤집어 조회
+// ============================================================
+const OPENING_BOOK = (() => {
+    const book = new Map();
+    const key = arr => arr.join('');
+    const B = (vals) => { const a = Array(24).fill(0); vals.forEach(([i,v]) => a[i]=v); return a; };
+
+    // 빈 보드 첫 수: 외곽 중점 1번(인덱스1) 선점
+    book.set(key(Array(24).fill(0)), 1);
+
+    // P1이 코너/중점에 뒀을 때 AI(P2)의 최선 응수
+    // 전략: 상대 수와 방사형으로 연결된 외곽 중점 선점 우선
+    book.set(key(B([[0,1]])), 1);   // P1 코너0 → AI 중점1
+    book.set(key(B([[1,1]])), 5);   // P1 중점1 → AI 반대편 중점5
+    book.set(key(B([[2,1]])), 3);   // P1 코너2 → AI 중점3
+    book.set(key(B([[3,1]])), 7);   // P1 중점3 → AI 반대편 중점7
+    book.set(key(B([[4,1]])), 5);   // P1 코너4 → AI 중점5
+    book.set(key(B([[5,1]])), 1);   // P1 중점5 → AI 반대편 중점1
+    book.set(key(B([[6,1]])), 7);   // P1 코너6 → AI 중점7
+    book.set(key(B([[7,1]])), 3);   // P1 중점7 → AI 반대편 중점3
+    book.set(key(B([[9,1]])), 11);  // P1 방사형9 → AI 방사형11
+    book.set(key(B([[11,1]])), 9);  // P1 방사형11 → AI 방사형9
+    book.set(key(B([[13,1]])), 15); // P1 방사형13 → AI 방사형15
+    book.set(key(B([[15,1]])), 13); // P1 방사형15 → AI 방사형13
+
+    // 2수 진행 후 응수 (외곽 중점 두 개를 상대가 점령 시 방사형 선점)
+    book.set(key(B([[1,1],[5,1]])), 9);   // P1이 1,5 → AI 9
+    book.set(key(B([[3,1],[7,1]])), 11);  // P1이 3,7 → AI 11
+    book.set(key(B([[1,1],[3,1]])), 17);  // P1이 인접 중점 → AI 내부 17
+    book.set(key(B([[5,1],[7,1]])), 21);  // P1이 인접 중점 → AI 내부 21
+
+    return book;
+})();
+
+// Opening Book 조회. 없으면 null 반환.
+// AI가 P1이면 P1↔P2 뒤집어 동일 전략 패턴 재사용.
+function lookupOpeningBook(b, aiPlayer) {
+    const key = b.join('');
+    if (OPENING_BOOK.has(key)) {
+        const pos = OPENING_BOOK.get(key);
+        if (b[pos] === EMPTY) return pos;
+    }
+    // P1 AI: 보드를 뒤집어 P2 기준 전략 조회
+    if (aiPlayer === P1) {
+        const flipped = b.map(v => v === 1 ? 2 : v === 2 ? 1 : 0);
+        const fKey = flipped.join('');
+        if (OPENING_BOOK.has(fKey)) {
+            const pos = OPENING_BOOK.get(fKey);
+            if (b[pos] === EMPTY) return pos;
+        }
+    }
+    return null;
+}
+
+// ============================================================
+// [신규2] ZOBRIST HASHING
+// 각 (위치, 플레이어) 쌍에 고유한 BigInt 랜덤값 할당.
+// board 해시 = 해당되는 모든 랜덤값의 XOR.
+// 동일 board 상태 → 동일 해시 (충돌 확률 1/2^64 수준으로 무시 가능)
+// ============================================================
+const zobristTable = (() => {
+    const t = [];
+    // 64bit 난수 생성: 상위 32bit + 하위 32bit BigInt 조합
+    const rand64 = () =>
+        (BigInt(Math.floor(Math.random() * 0xFFFFFFFF)) << 32n) |
+        BigInt(Math.floor(Math.random() * 0xFFFFFFFF));
+    for (let i = 0; i < 24; i++) {
+        // index 0 = EMPTY (사용 안 함), 1 = P1, 2 = P2
+        t.push([0n, rand64(), rand64()]);
+    }
+    return t;
+})();
+
+function computeZobrist(b) {
+    let h = 0n;
+    for (let i = 0; i < 24; i++) {
+        if (b[i] !== EMPTY) h ^= zobristTable[i][b[i]];
+    }
+    return h;
+}
+
+// ============================================================
+// [신규3] TRANSPOSITION TABLE (TT)
+// 구조: Map<hashString, { depth, flag, value, bestMove }>
+// flag 종류:
+//   'EXACT'      — 탐색 완료, 정확한 값
+//   'LOWERBOUND' — beta 컷오프 발생, 실제값 >= 저장값
+//   'UPPERBOUND' — alpha 컷오프 발생, 실제값 <= 저장값
+//
+// TT 활용:
+//   1. 탐색 전: 동일 board를 이미 같거나 더 깊게 탐색했으면 즉시 반환
+//   2. α/β 경계 조정: LOWER/UPPERBOUND로 가지치기 범위 좁힘
+//   3. bestMove: Move Ordering에서 최우선 탐색 수로 사용
+//
+// 크기 제한: 200,000 엔트리 초과 시 오래된 항목 1,000개 삭제
+// ============================================================
+let transpositionTable = new Map();
+const TT_MAX_SIZE = 200000;
+
+function ttGet(hash) {
+    return transpositionTable.get(hash.toString()) || null;
+}
+
+function ttSet(hash, depth, flag, value, bestMove) {
+    if (transpositionTable.size >= TT_MAX_SIZE) {
+        // 간단한 FIFO 방식으로 오래된 항목 제거
+        const iter = transpositionTable.keys();
+        for (let i = 0; i < 1000; i++) {
+            const k = iter.next().value;
+            if (k !== undefined) transpositionTable.delete(k);
+        }
+    }
+    transpositionTable.set(hash.toString(), { depth, flag, value, bestMove });
+}
+
+function ttClear() { transpositionTable = new Map(); }
+
+// ============================================================
+// 게임 로직 유틸리티 (board 인자 지원)
+// ============================================================
+
+function isMill(pos, player, b = board) {
+    return mills.some(m => m.includes(pos) && m.every(i => b[i] === player));
+}
+
+function getRemovableTargets(player, b = board) {
+    const opponent = player === P1 ? P2 : P1;
+    let targets = b.map((v, i) => (v === opponent && !isMill(i, opponent, b) ? i : null)).filter(v => v !== null);
+    if (targets.length === 0)
+        targets = b.map((v, i) => (v === opponent ? i : null)).filter(v => v !== null);
+    return targets;
+}
+
+function getMovesForPlayer(player, b) {
+    const pieces = b.map((v, i) => v === player ? i : null).filter(v => v !== null);
+    const fly = pieces.length === 3;
+    const moves = [];
+    for (const from of pieces) {
+        const targets = fly
+            ? b.map((v, i) => v === EMPTY ? i : null).filter(v => v !== null)
+            : adj[from].filter(i => b[i] === EMPTY);
+        for (const to of targets) moves.push({ from, to });
+    }
+    return moves;
+}
+
+// placing 단계용 수 목록 (from=-1 규약)
+function getPlacingMoves(b) {
+    return b.map((v, i) => v === EMPTY ? { from: -1, to: i } : null).filter(v => v !== null);
+}
+
+// ============================================================
+// 평가 함수
+// ① 말 수 차이
+// ② 밀 잠재력 (2개 연속)
+// ③ 이중 밀(double mill) 보너스: 한 말이 2개 이상의 밀에 동시 참여
+// ④ mobility 차이 (이동 가능한 수 차이)
+// ============================================================
+function evaluate(b, aiPlayer) {
+    const opp = aiPlayer === P1 ? P2 : P1;
+    const aiPieces  = b.map((v,i) => v === aiPlayer ? i : null).filter(v => v !== null);
+    const oppPieces = b.map((v,i) => v === opp ? i : null).filter(v => v !== null);
+    const aiCount   = aiPieces.length;
+    const oppCount  = oppPieces.length;
+
+    if (oppCount <= 2) return 10000;
+    if (aiCount  <= 2) return -10000;
+
+    const aiMoves  = getMovesForPlayer(aiPlayer, b).length;
+    const oppMoves = getMovesForPlayer(opp, b).length;
+    if (oppMoves === 0) return 10000;
+    if (aiMoves  === 0) return -10000;
+
+    let score = 0;
+
+    // ① 말 수 차이
+    score += (aiCount - oppCount) * 20;
+
+    // ② 밀 잠재력
+    for (const m of mills) {
+        const aiIn  = m.filter(i => b[i] === aiPlayer).length;
+        const oppIn = m.filter(i => b[i] === opp).length;
+        if (oppIn === 0) score += aiIn  * aiIn  * 4;
+        if (aiIn  === 0) score -= oppIn * oppIn * 4;
+    }
+
+    // ③ 이중 밀 보너스
+    for (const pos of aiPieces) {
+        let potential = mills.filter(m => m.includes(pos) && m.filter(i => b[i] === opp).length === 0).length;
+        if (potential >= 2) score += 15;
+    }
+    for (const pos of oppPieces) {
+        let potential = mills.filter(m => m.includes(pos) && m.filter(i => b[i] === aiPlayer).length === 0).length;
+        if (potential >= 2) score -= 15;
+    }
+
+    // ④ mobility 차이
+    score += (aiMoves - oppMoves) * 2;
+
+    return score;
+}
+
+// ============================================================
+// [신규4] MOVE ORDERING
+// 탐색 전 수를 정렬해 α-β 컷오프 발생을 극대화.
+// 우선순위:
+//   1000 — TT bestMove (이전 탐색에서 최선으로 확인된 수)
+//    100 — 밀 완성 수
+//     50 — 상대 밀 차단 수
+//      0 — 나머지
+// ============================================================
+function orderMoves(moves, b, currentP, ttBestMove) {
+    const opp = currentP === P1 ? P2 : P1;
+    return moves
+        .map(mv => {
+            // TT bestMove 최우선
+            if (ttBestMove &&
+                mv.from === ttBestMove.from &&
+                mv.to   === ttBestMove.to) return { mv, priority: 1000 };
+
+            const nb = b.slice();
+            if (mv.from !== -1) nb[mv.from] = EMPTY;
+            nb[mv.to] = currentP;
+
+            let priority = 0;
+            if (isMill(mv.to, currentP, nb)) priority += 100;
+            for (const m of mills) {
+                if (!m.includes(mv.to)) continue;
+                const oppIn   = m.filter(i => b[i] === opp).length;
+                const emptyIn = m.filter(i => b[i] === EMPTY).length;
+                if (oppIn === 2 && emptyIn === 1) { priority += 50; break; }
+            }
+            return { mv, priority };
+        })
+        .sort((a, b) => b.priority - a.priority)
+        .map(x => x.mv);
+}
+
+// ============================================================
+// [신규5] MINIMAX + ALPHA-BETA + TRANSPOSITION TABLE
+//
+// TT 조회 흐름:
+//   1. 현재 board의 Zobrist 해시 계산
+//   2. TT에 같은 해시가 있고 depth ≥ 현재 depth → 즉시 반환 또는 α/β 조정
+//   3. 탐색 완료 후 결과를 flag와 함께 TT에 저장
+//
+// flag 판정 기준:
+//   best >= beta(원래)  → LOWERBOUND (fail-high: 이 노드를 전부 탐색하지 못함)
+//   best <= alpha(원래) → UPPERBOUND (fail-low: 상위에서 이미 더 좋은 선택지 존재)
+//   그 외               → EXACT      (완전 탐색)
+// ============================================================
+function minimax(b, depth, alpha, beta, isMaximizing, aiPlayer, placedState) {
+    const opp = aiPlayer === P1 ? P2 : P1;
+    const currentP = isMaximizing ? aiPlayer : opp;
+    const originalAlpha = alpha;
+    const originalBeta  = beta;
+
+    // --- TT 조회 ---
+    const hash = computeZobrist(b);
+    const ttEntry = ttGet(hash);
+    let ttBestMove = null;
+    if (ttEntry) {
+        ttBestMove = ttEntry.bestMove;
+        if (ttEntry.depth >= depth) {
+            if (ttEntry.flag === 'EXACT')      return ttEntry.value;
+            if (ttEntry.flag === 'LOWERBOUND') alpha = Math.max(alpha, ttEntry.value);
+            if (ttEntry.flag === 'UPPERBOUND') beta  = Math.min(beta,  ttEntry.value);
+            if (alpha >= beta) return ttEntry.value;
+        }
+    }
+
+    // --- 단말 노드 ---
+    if (depth === 0) {
+        const val = evaluate(b, aiPlayer);
+        ttSet(hash, 0, 'EXACT', val, null);
+        return val;
+    }
+
+    // --- 종료 상태 체크 ---
+    const oppCount = b.filter(v => v === opp).length;
+    const aiCount  = b.filter(v => v === aiPlayer).length;
+    if (oppCount <= 2 && placedState[opp] === 9)      return 10000;
+    if (aiCount  <= 2 && placedState[aiPlayer] === 9) return -10000;
+
+    let best = isMaximizing ? -Infinity : Infinity;
+    let bestMove = null;
+
+    // --- placing 단계 ---
+    if (placedState[currentP] < 9) {
+        const rawMoves = orderMoves(getPlacingMoves(b), b, currentP, ttBestMove);
+        const newPlacedBase = { ...placedState, [currentP]: placedState[currentP] + 1 };
+
+        for (const mv of rawMoves) {
+            const nb = b.slice();
+            nb[mv.to] = currentP;
+
+            const applyAndRecurse = (nb2) => {
+                const val = minimax(nb2, depth - 1, alpha, beta, !isMaximizing, aiPlayer, newPlacedBase);
+                if (isMaximizing) {
+                    if (val > best) { best = val; bestMove = mv; }
+                    alpha = Math.max(alpha, best);
+                } else {
+                    if (val < best) { best = val; bestMove = mv; }
+                    beta = Math.min(beta, best);
+                }
+            };
+
+            if (isMill(mv.to, currentP, nb)) {
+                const targets = getRemovableTargets(currentP, nb);
+                for (const t of (targets.length > 0 ? targets : [])) {
+                    const nb2 = nb.slice(); nb2[t] = EMPTY;
+                    applyAndRecurse(nb2);
+                    if (beta <= alpha) break;
+                }
+            } else {
+                applyAndRecurse(nb);
+            }
+            if (beta <= alpha) break;
+        }
+
+    // --- moving 단계 ---
+    } else {
+        const rawMoves = getMovesForPlayer(currentP, b);
+        if (rawMoves.length === 0) return isMaximizing ? -10000 : 10000;
+
+        const orderedMoves = orderMoves(rawMoves, b, currentP, ttBestMove);
+
+        for (const { from, to } of orderedMoves) {
+            const nb = b.slice();
+            nb[from] = EMPTY; nb[to] = currentP;
+
+            const applyAndRecurse = (nb2) => {
+                const val = minimax(nb2, depth - 1, alpha, beta, !isMaximizing, aiPlayer, placedState);
+                if (isMaximizing) {
+                    if (val > best) { best = val; bestMove = { from, to }; }
+                    alpha = Math.max(alpha, best);
+                } else {
+                    if (val < best) { best = val; bestMove = { from, to }; }
+                    beta = Math.min(beta, best);
+                }
+            };
+
+            if (isMill(to, currentP, nb)) {
+                const targets = getRemovableTargets(currentP, nb);
+                for (const t of targets) {
+                    const nb2 = nb.slice(); nb2[t] = EMPTY;
+                    applyAndRecurse(nb2);
+                    if (beta <= alpha) break;
+                }
+            } else {
+                applyAndRecurse(nb);
+            }
+            if (beta <= alpha) break;
+        }
+    }
+
+    // --- TT 저장 ---
+    // flag는 원래 alpha/beta 기준으로 판정 (조정된 값 아님)
+    let flag;
+    if      (best >= originalBeta)  flag = 'LOWERBOUND';
+    else if (best <= originalAlpha) flag = 'UPPERBOUND';
+    else                            flag = 'EXACT';
+    ttSet(hash, depth, flag, best, bestMove);
+
+    return best;
+}
+
+// ============================================================
+// [신규6] ITERATIVE DEEPENING (ID-αβ)
+//
+// 작동 방식:
+//   depth=1 부터 시작 → 완료 시 bestResult 갱신 → depth 증가 반복
+//   시간 제한(TIME_LIMIT_MS * 0.7)에 도달하면 다음 depth 탐색 시작 안 함
+//   현재 depth 탐색 중간에 시간 초과 시 해당 depth 결과는 버리고
+//   직전 depth의 완성된 결과 사용 (안전성 보장)
+//
+// TT와의 시너지:
+//   얕은 depth의 탐색 결과가 TT에 저장됨
+//   → 깊은 depth 탐색 시 Move Ordering에 TT bestMove가 활용됨
+//   → 같은 시간에 더 효율적인 가지치기 달성
+//
+// 승리 확정 수(val >= 9000) 발견 시 즉시 탐색 종료
+// ============================================================
+const TIME_LIMIT_MS = 800;
+const ID_MAX_DEPTH  = 8;
+
+function iterativeDeepening(isPlacing, aiPlayer) {
+    const startTime = performance.now();
+    let bestResult = null;
+    let reachedDepth = 0;
+
+    for (let depth = 1; depth <= ID_MAX_DEPTH; depth++) {
+        // 이전 depth 탐색 완료 후 시간 확인
+        if (performance.now() - startTime > TIME_LIMIT_MS * 0.7) break;
+
+        let candidate = null;
+        let bestVal = -Infinity;
+        let timeoutFlag = false;
+
+        if (isPlacing) {
+            const ttBM = ttGet(computeZobrist(board))?.bestMove || null;
+            const moves = orderMoves(getPlacingMoves(board), board, aiPlayer, ttBM);
+
+            for (const mv of moves) {
+                if (performance.now() - startTime > TIME_LIMIT_MS) { timeoutFlag = true; break; }
+                const nb = board.slice();
+                nb[mv.to] = aiPlayer;
+                const newPlaced = { ...placed, [aiPlayer]: placed[aiPlayer] + 1 };
+
+                let val;
+                if (isMill(mv.to, aiPlayer, nb)) {
+                    const targets = getRemovableTargets(aiPlayer, nb);
+                    val = -Infinity;
+                    for (const t of targets) {
+                        const nb2 = nb.slice(); nb2[t] = EMPTY;
+                        val = Math.max(val, minimax(nb2, depth - 1, -Infinity, Infinity, false, aiPlayer, newPlaced));
+                    }
+                } else {
+                    val = minimax(nb, depth - 1, -Infinity, Infinity, false, aiPlayer, newPlaced);
+                }
+
+                if (val > bestVal) { bestVal = val; candidate = mv.to; }
+            }
+        } else {
+            const ttBM = ttGet(computeZobrist(board))?.bestMove || null;
+            const rawMoves = getMovesForPlayer(aiPlayer, board);
+            if (rawMoves.length === 0) break;
+            const moves = orderMoves(rawMoves, board, aiPlayer, ttBM);
+
+            for (const { from, to } of moves) {
+                if (performance.now() - startTime > TIME_LIMIT_MS) { timeoutFlag = true; break; }
+                const nb = board.slice();
+                nb[from] = EMPTY; nb[to] = aiPlayer;
+
+                let val;
+                if (isMill(to, aiPlayer, nb)) {
+                    const targets = getRemovableTargets(aiPlayer, nb);
+                    val = -Infinity;
+                    for (const t of targets) {
+                        const nb2 = nb.slice(); nb2[t] = EMPTY;
+                        val = Math.max(val, minimax(nb2, depth - 1, -Infinity, Infinity, false, aiPlayer, placed));
+                    }
+                } else {
+                    val = minimax(nb, depth - 1, -Infinity, Infinity, false, aiPlayer, placed);
+                }
+
+                if (val > bestVal) { bestVal = val; candidate = { from, to }; }
+            }
+        }
+
+        // 중간에 시간 초과된 경우 해당 depth 결과는 신뢰하지 않음
+        if (!timeoutFlag && candidate !== null) {
+            bestResult  = candidate;
+            reachedDepth = depth;
+        }
+
+        // 승리 확정 수를 찾으면 더 탐색 불필요
+        if (bestVal >= 9000) break;
+    }
+
+    const elapsed = Math.round(performance.now() - startTime);
+    setAiInfo(`depth ${reachedDepth} | ${elapsed}ms | TT: ${transpositionTable.size.toLocaleString()}`);
+    return bestResult;
+}
+
+// ============================================================
+// UI / 게임 흐름
+// ============================================================
+
+function setAiInfo(msg) {
+    const el = document.getElementById('ai-info');
+    if (el) el.innerText = msg;
+}
+
+function showAIMenu() {
+    document.getElementById("menu").innerHTML = `
+        <button class="diff-btn diff-easy" onclick="showSideMenu('easy')">🟢 쉬움</button>
+        <button class="diff-btn diff-hard" onclick="showSideMenu('hard')">🔴 어려움</button>
+        <button class="diff-btn diff-aivai" onclick="startGame('aivai',1)">🤖 AI끼리 대결</button>
+        <button onclick="showMainMenu()" style="font-size:0.82em;padding:8px 14px;">← 뒤로</button>
+    `;
+}
+
+function showSideMenu(difficulty) {
+    const label = difficulty === 'easy' ? '🟢 쉬움' : '🔴 어려움';
+    document.getElementById("menu").innerHTML = `
+        <span style="font-size:0.82em;color:rgba(255,255,255,0.4);width:100%;text-align:center;display:block;margin-bottom:4px;">${label} — 선후공 선택</span>
+        <button class="diff-btn ${difficulty === 'easy' ? 'diff-easy' : 'diff-hard'}" onclick="startGame('${difficulty}',1)">내가 선공 (파랑)</button>
+        <button class="diff-btn ${difficulty === 'easy' ? 'diff-easy' : 'diff-hard'}" onclick="startGame('${difficulty}',2)">AI가 선공 (빨강)</button>
+        <button onclick="showAIMenu()" style="font-size:0.82em;padding:8px 14px;">← 뒤로</button>
+    `;
+}
+
+function startGame(m, side) {
+    mode = m;
+    userSide = (m === 'aivai') ? 0 : side;
+    board = Array(24).fill(EMPTY);
+    placed = {1: 0, 2: 0};
+    phase = "placing";
+    selectedPiece = null;
+    gameOver = false;
+    gameLog = [];
+    noCaptureTurns = 0;
+    historyStack = [];
+    currentPlayer = P1;
+    ttClear();
+
+    draw();
+    updateStatus();
+    setAiInfo('');
+    updateUndoButton();
+
+    document.getElementById("menu").innerHTML = `
+        <button onclick="showMainMenu()" style="font-size:0.82em;padding:8px 14px;">← 메뉴</button>
+        <button onclick="saveData()" style="font-size:0.82em;padding:8px 14px;">💾 저장</button>
+    `;
+    if (mode !== 'aivai') {
+        document.getElementById("menu").innerHTML += `
+            <button id="undo-btn" onclick="undoMove()" style="font-size:0.82em;padding:8px 14px;">↩ 무르기</button>
+        `;
+    }
+    document.getElementById('piece-panel').classList.add('visible');
+    updatePiecePanel();
+
+    if (isAI()) setTimeout(aiTurn, 600);
+}
+
+// 현재 상태 스냅샷 저장
+function saveSnapshot() {
+    historyStack.push({
+        board: board.slice(),
+        placed: { ...placed },
+        phase,
+        currentPlayer,
+        noCaptureTurns,
+        gameLog: gameLog.map(e => ({ ...e }))
+    });
+}
+
+// 무르기 가능 여부 업데이트
+function updateUndoButton() {
+    const btn = document.getElementById('undo-btn');
+    if (!btn) return;
+    // removing 중이거나 AI 턴 진행 중이거나 스택 없으면 비활성
+    btn.disabled = historyStack.length === 0 || gameOver || phase === 'removing';
+    btn.style.opacity = btn.disabled ? '0.4' : '1';
+}
+
+// 무르기 실행
+function undoMove() {
+    if (historyStack.length === 0 || gameOver || phase === 'removing') return;
+
+    const isPvp  = mode === 'pvp';
+    const isAiMode = (mode === 'easy' || mode === 'hard');
+
+    if (isPvp) {
+        // PVP: 1칸만 되돌리기
+        const snap = historyStack.pop();
+        restoreSnapshot(snap);
+    } else if (isAiMode) {
+        // AI 모드: 마지막이 사람 수이면 1개, AI 수까지 포함됐으면 2개 되돌리기
+        // historyStack의 마지막 스냅샷 직전 상태의 currentPlayer로 판단
+        if (historyStack.length === 0) return;
+
+        // 마지막 스냅샷(= 직전 수 두기 전 상태)의 currentPlayer가 사람이면
+        // 그 수가 사람 수 → 1개만
+        // AI 수이면 → AI+사람 수 합쳐서 2개
+        const lastSnap = historyStack[historyStack.length - 1];
+        if (lastSnap.currentPlayer === userSide) {
+            // 마지막 저장 시점이 사람 차례였음 = 사람 수 1개만 물러줌
+            const snap = historyStack.pop();
+            restoreSnapshot(snap);
+        } else {
+            // 마지막 저장 시점이 AI 차례였음 = AI 수 + 그 전 사람 수 같이 물러줌
+            historyStack.pop(); // AI 수 이전
+            if (historyStack.length > 0) {
+                const snap = historyStack.pop(); // 사람 수 이전
+                restoreSnapshot(snap);
+            } else {
+                // 스택이 비었으면 그냥 AI 수 이전으로만
+                restoreSnapshot(lastSnap);
+            }
+        }
+    }
+}
+
+function restoreSnapshot(snap) {
+    board          = snap.board.slice();
+    placed         = { ...snap.placed };
+    phase          = snap.phase;
+    currentPlayer  = snap.currentPlayer;
+    noCaptureTurns = snap.noCaptureTurns;
+    gameLog        = snap.gameLog.map(e => ({ ...e }));
+    selectedPiece  = null;
+    removingPlayer = null;
+    gameOver       = false;
+    draw();
+    updateStatus();
+    updateDrawCounter();
+    updatePiecePanel();
+    updateUndoButton();
+    setAiInfo('');
+}
+
+function isAI() {
+    if (mode === 'aivai') return true;
+    if (mode === 'easy' || mode === 'hard') return currentPlayer !== userSide;
+    if (mode !== 'ai') return false; // pvp
+    return currentPlayer !== userSide;
+}
+
+// 현재 테마
+let currentTheme = 'classic';
+
+// ── 피 흘러내리기 제거 (정적 배경으로 대체) ──
+let bloodAnim = null;
+function startBloodDrip() {
+    const bc = document.getElementById('blood-canvas');
+    if (bc) bc.getContext('2d').clearRect(0, 0, bc.width, bc.height);
+}
+function stopBloodDrip() {
+    const bc = document.getElementById('blood-canvas');
+    if (bc) bc.getContext('2d').clearRect(0, 0, bc.width, bc.height);
+}
+
+// ── 매트릭스 배경 (고정, 애니메이션 없음) ──
+let matrixAnim = null;
+function startMatrixRain() {
+    if (matrixAnim) { clearInterval(matrixAnim); matrixAnim = null; }
+    const mc = document.getElementById('matrix-canvas');
+    if (!mc) return;
+    mc.style.width  = window.innerWidth  + 'px';
+    mc.style.height = window.innerHeight + 'px';
+    mc.width  = window.innerWidth;
+    mc.height = window.innerHeight;
+    const rc = mc.getContext('2d');
+    const W = mc.width, H = mc.height;
+    const cols = Math.floor(W / 16);
+    const chars = '0123456789ABCDEF01101001';
+
+    // 한 번만 그림 — 고정 배경
+    rc.fillStyle = '#000800';
+    rc.fillRect(0, 0, W, H);
+    for (let i = 0; i < cols; i++) {
+        const rowCount = Math.floor(H / 16);
+        for (let j = 0; j < rowCount; j++) {
+            const bright = Math.random() > 0.92;
+            const visible = Math.random() > 0.35; // 일부만 표시 (성긴 느낌)
+            if (!visible) continue;
+            rc.fillStyle = bright ? '#c0ffe8' : (Math.random() > 0.6 ? '#00aa33' : '#006622');
+            rc.font = (bright ? 'bold ' : '') + '13px monospace';
+            rc.globalAlpha = 0.3 + Math.random() * 0.7;
+            rc.fillText(chars[Math.floor(Math.random() * chars.length)], i * 16, j * 16 + 14);
+        }
+    }
+    rc.globalAlpha = 1;
+}
+
+function stopMatrixRain() {
+    if (matrixAnim) { clearInterval(matrixAnim); matrixAnim = null; }
+    const mc = document.getElementById('matrix-canvas');
+    if (mc) mc.getContext('2d').clearRect(0, 0, mc.width, mc.height);
+}
+
+function openThemeModal() {
+    ['classic','bauhaus','cyber','horror','claymorphism'].forEach(t => {
+        const btn = document.getElementById('theme-opt-' + t);
+        if (btn) btn.classList.toggle('active', t === currentTheme);
+    });
+    document.getElementById('theme-modal-overlay').classList.add('show');
+}
+function closeThemeModal() {
+    document.getElementById('theme-modal-overlay').classList.remove('show');
+}
+function selectTheme(theme) {
+    currentTheme = theme;
+    document.body.classList.remove('theme-cyber','theme-bauhaus','theme-horror','theme-claymorphism');
+    if (theme !== 'classic') document.body.classList.add('theme-' + theme);
+    if (theme === 'cyber') startMatrixRain(); else stopMatrixRain();
+    if (theme === 'horror') startBloodDrip(); else stopBloodDrip();
+    ['classic','bauhaus','cyber','horror','claymorphism'].forEach(t => {
+        const btn = document.getElementById('theme-opt-' + t);
+        if (btn) btn.classList.toggle('active', t === theme);
+    });
+    closeThemeModal(); draw();
+    if (replaySnapshots.length > 0) replayDraw();
+}
+document.getElementById('theme-modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeThemeModal();
+});
+
+function draw() {
+    if (!board) return;
+    if (currentTheme === 'cyber')            drawCyber();
+    else if (currentTheme === 'bauhaus')     drawBauhaus();
+    else if (currentTheme === 'horror')      drawHorror();
+    else if (currentTheme === 'claymorphism') drawClaymorphism();
+    else drawClassic();
+}
+
+// ── 클래식 테마 보드 ──
+function drawClassic() {
+    const W = 500;
+    ctx.clearRect(0, 0, W, W);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, W);
+
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    lines.forEach(([a, b]) => {
+        ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke();
+    });
+
+    for (const mill of mills) {
+        if (mill.every(i => board[i] === P1)) {
+            ctx.strokeStyle = '#3498db'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(...p[mill[0]]); ctx.lineTo(...p[mill[1]]); ctx.lineTo(...p[mill[2]]); ctx.stroke();
+        } else if (mill.every(i => board[i] === P2)) {
+            ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(...p[mill[0]]); ctx.lineTo(...p[mill[1]]); ctx.lineTo(...p[mill[2]]); ctx.stroke();
+        }
+    }
+
+    for (let i = 0; i < 24; i++) {
+        const [x, y] = p[i];
+        ctx.fillStyle = '#333';
+        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI*2); ctx.fill();
+        if (board[i]) {
+            ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI*2);
+            ctx.fillStyle = board[i] === P1 ? '#3498db' : '#e74c3c';
+            ctx.fill();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+        }
+        ctx.fillStyle = '#666'; ctx.font = 'bold 12px Arial';
+        ctx.fillText((i+1).toString(), x+10, y+20);
+    }
+
+    if (selectedPiece !== null) {
+        ctx.strokeStyle = '#f1c40f'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.arc(...p[selectedPiece], 22, 0, Math.PI*2); ctx.stroke();
+    }
+}
+
+// ── 바우하우스 테마 보드 ──
+// 원색 원형 말, 굵은 검정선, 기하학적 교차점, 순수한 형태
+function drawBauhaus() {
+    const W = 500;
+    ctx.clearRect(0, 0, W, W);
+
+    // 크림 배경
+    ctx.fillStyle = '#faf8f3';
+    ctx.fillRect(0, 0, W, W);
+
+    // 장식용 기하 도형 (배경 레이어)
+    // 빨강 큰 원 - 좌상단
+    ctx.fillStyle = 'rgba(214,40,40,0.07)';
+    ctx.beginPath(); ctx.arc(0, 0, 180, 0, Math.PI*2); ctx.fill();
+    // 파랑 반원 - 우하단
+    ctx.fillStyle = 'rgba(0,63,136,0.06)';
+    ctx.beginPath(); ctx.arc(W, W, 200, 0, Math.PI*2); ctx.fill();
+    // 노랑 사각형 - 배경
+    ctx.fillStyle = 'rgba(255,221,0,0.08)';
+    ctx.fillRect(W*0.6, 0, W*0.4, W*0.35);
+
+    // 보드 선 — 굵고 검정
+    ctx.strokeStyle = '#111';
+    ctx.lineWidth = 3;
+    lines.forEach(([a, b]) => {
+        ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke();
+    });
+
+    // 밀 강조 — 원색 굵은 선
+    for (const mill of mills) {
+        let color = null;
+        if (mill.every(i => board[i] === P1)) color = '#003F88';       // 바우하우스 파랑
+        else if (mill.every(i => board[i] === P2)) color = '#D62828';   // 바우하우스 빨강
+        if (color) {
+            ctx.strokeStyle = color; ctx.lineWidth = 8;
+            ctx.lineCap = 'square';
+            ctx.beginPath();
+            ctx.moveTo(...p[mill[0]]); ctx.lineTo(...p[mill[1]]); ctx.lineTo(...p[mill[2]]);
+            ctx.stroke();
+            ctx.lineCap = 'butt';
+        }
+    }
+
+    // 교차점 & 말
+    for (let i = 0; i < 24; i++) {
+        const [x, y] = p[i];
+
+        if (board[i]) {
+            const isP1 = board[i] === P1;
+
+            // 선택된 말: 노란 사각형 배경
+            if (selectedPiece === i) {
+                ctx.fillStyle = '#FFDD00';
+                ctx.fillRect(x - 26, y - 26, 52, 52);
+                ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
+                ctx.strokeRect(x - 26, y - 26, 52, 52);
+            }
+
+            // 원형 말 (바우하우스 원색)
+            ctx.fillStyle = isP1 ? '#003F88' : '#D62828';
+            ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI*2); ctx.fill();
+
+            // 검정 테두리
+            ctx.strokeStyle = '#111'; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI*2); ctx.stroke();
+
+            // 중심 작은 원 (안쪽 디테일)
+            ctx.fillStyle = isP1 ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.2)';
+            ctx.beginPath(); ctx.arc(x - 5, y - 5, 7, 0, Math.PI*2); ctx.fill();
+
+        } else {
+            // 빈 교차점: 검정 사각형
+            ctx.fillStyle = '#111';
+            ctx.fillRect(x - 5, y - 5, 10, 10);
+        }
+
+        // 번호 — 검정 굵은
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        ctx.font = 'bold 11px Arial';
+        ctx.fillText((i + 1).toString(), x + 11, y + 20);
+    }
+}
+
+// ── 클레이모피즘 테마 보드 ──
+// 파스텔 배경, 두꺼운 그림자 말, 부드러운 선, 뽀글뽀글 버블 교차점
+function drawClaymorphism() {
+    const W = 500;
+    ctx.clearRect(0, 0, W, W);
+
+    // 배경 — 파스텔 그라디언트
+    const bgG = ctx.createLinearGradient(0, 0, W, W);
+    bgG.addColorStop(0, '#fde8ff');
+    bgG.addColorStop(0.5, '#e8f0ff');
+    bgG.addColorStop(1, '#fff0f8');
+    ctx.fillStyle = bgG; ctx.fillRect(0, 0, W, W);
+
+    // 배경 장식 — 귀여운 원형 블롭들
+    const blobs = [
+        [60, 60, 45, 'rgba(255,180,220,0.18)'],
+        [440, 80, 55, 'rgba(180,200,255,0.16)'],
+        [80, 430, 50, 'rgba(200,255,200,0.14)'],
+        [430, 430, 60, 'rgba(255,220,180,0.15)'],
+        [250, 250, 70, 'rgba(220,180,255,0.1)'],
+    ];
+    blobs.forEach(([bx,by,br,bc]) => {
+        ctx.fillStyle = bc;
+        ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI*2); ctx.fill();
+    });
+
+    // 선 — 두껍고 부드러운 라운드
+    ctx.strokeStyle = 'rgba(180,150,230,0.45)';
+    ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    lines.forEach(([a,b]) => {
+        ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke();
+    });
+
+    // 밀 강조
+    for (const mill of mills) {
+        if (mill.every(i => board[i] === P1)) clayMill(mill, '#88aaff', '#bbccff');
+        else if (mill.every(i => board[i] === P2)) clayMill(mill, '#ff88aa', '#ffbbcc');
+    }
+
+    // 교차점 & 말
+    for (let i = 0; i < 24; i++) {
+        const [x, y] = p[i];
+
+        if (board[i]) {
+            const isP1 = board[i] === P1;
+            // P1: 하늘파랑, P2: 복숭아핑크
+            const base = isP1 ? '#88aaff' : '#ff99bb';
+            const lite = isP1 ? '#ccdeff' : '#ffd0e0';
+            const dark = isP1 ? '#4466cc' : '#cc4477';
+            const shadow = isP1 ? 'rgba(80,100,220,0.35)' : 'rgba(220,80,120,0.35)';
+
+            // 선택 링 — 노란 뽀글이
+            if (selectedPiece === i) {
+                ctx.save();
+                ctx.strokeStyle = '#ffcc00';
+                ctx.lineWidth = 4;
+                ctx.shadowColor = '#ffcc00'; ctx.shadowBlur = 12;
+                ctx.beginPath(); ctx.arc(x, y, 26, 0, Math.PI*2); ctx.stroke();
+                ctx.restore();
+            }
+
+            // 클레이 그림자 (두껍게 아래로)
+            ctx.fillStyle = shadow;
+            ctx.beginPath(); ctx.ellipse(x+2, y+8, 17, 9, 0, 0, Math.PI*2); ctx.fill();
+
+            // 본체 — 크고 동그랗게
+            const g = ctx.createRadialGradient(x-7, y-7, 1, x, y, 20);
+            g.addColorStop(0, '#ffffff');
+            g.addColorStop(0.15, lite);
+            g.addColorStop(0.6, base);
+            g.addColorStop(1, dark);
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI*2); ctx.fill();
+
+            // 큰 하이라이트 — 탱글탱글 유리구슬 느낌
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.beginPath(); ctx.ellipse(x-6, y-7, 8, 6, -0.4, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.beginPath(); ctx.ellipse(x+5, y-2, 4, 3, 0.5, 0, Math.PI*2); ctx.fill();
+
+            // 볼록 테두리 (얇은 흰 테두리)
+            ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI*2); ctx.stroke();
+
+        } else {
+            // 빈 교차점 — 귀여운 하트 모양 아이콘 대신 작은 별 느낌 원
+            ctx.fillStyle = 'rgba(200,170,240,0.2)';
+            ctx.beginPath(); ctx.arc(x, y+3, 9, 0, Math.PI*2); ctx.fill(); // 그림자
+            ctx.fillStyle = 'rgba(230,210,255,0.6)';
+            ctx.strokeStyle = 'rgba(190,160,230,0.55)';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            // 반짝이 하이라이트
+            ctx.fillStyle = 'rgba(255,255,255,0.65)';
+            ctx.beginPath(); ctx.arc(x-2.5, y-2.5, 3, 0, Math.PI*2); ctx.fill();
+        }
+
+        ctx.fillStyle = 'rgba(120,90,180,0.45)';
+        ctx.font = 'bold 11px Arial';
+        ctx.fillText((i+1).toString(), x+13, y+21);
+    }
+}
+
+function clayMill(mill, colorA, colorB) {
+    const [a,b,c] = mill.map(i => p[i]);
+    ctx.save();
+    // 그림자
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.lineWidth = 10; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(a[0]+1,a[1]+5); ctx.lineTo(b[0]+1,b[1]+5); ctx.lineTo(c[0]+1,c[1]+5); ctx.stroke();
+    // 흰 테두리 (두께감)
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 9;
+    ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.lineTo(c[0],c[1]); ctx.stroke();
+    // 컬러 실선
+    const g = ctx.createLinearGradient(a[0],a[1],c[0],c[1]);
+    g.addColorStop(0,colorA); g.addColorStop(0.5,colorB); g.addColorStop(1,colorA);
+    ctx.strokeStyle = g; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.lineTo(c[0],c[1]); ctx.stroke();
+    ctx.restore();
+}
+
+// ── 호러 테마 보드 ──
+function drawHorror() {
+    const W = 500;
+    ctx.clearRect(0, 0, W, W);
+
+    // 배경: 깊은 어둠
+    ctx.fillStyle = '#0d0008';
+    ctx.fillRect(0, 0, W, W);
+
+    // 배경 핏빛 글로우
+    const bgGrad = ctx.createRadialGradient(W*0.2, W*0.2, 0, W*0.2, W*0.2, W*0.5);
+    bgGrad.addColorStop(0, 'rgba(100,0,0,0.18)');
+    bgGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, W);
+    const bgGrad2 = ctx.createRadialGradient(W*0.8, W*0.8, 0, W*0.8, W*0.8, W*0.4);
+    bgGrad2.addColorStop(0, 'rgba(80,0,20,0.14)');
+    bgGrad2.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bgGrad2; ctx.fillRect(0, 0, W, W);
+
+    // 균열 느낌 미세 선
+    ctx.strokeStyle = 'rgba(100,0,0,0.06)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= W; x += 30) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, W); ctx.stroke();
+    }
+    for (let y = 0; y <= W; y += 30) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // 보드 선 — 핏빛 글로우
+    ctx.save();
+    ctx.shadowColor = 'rgba(180,0,0,0.7)';
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = 'rgba(139,0,0,0.3)';
+    ctx.lineWidth = 4;
+    lines.forEach(([a,b]) => {
+        ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke();
+    });
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(160,30,30,0.65)';
+    ctx.lineWidth = 1.5;
+    lines.forEach(([a,b]) => {
+        ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke();
+    });
+
+    // 밀 강조 — 핏빛 vs 해골 흰빛
+    for (const mill of mills) {
+        if (mill.every(i => board[i] === P1)) drawHorrorMill(mill, '#3a7bd5', '#00d2ff');
+        else if (mill.every(i => board[i] === P2)) drawHorrorMill(mill, '#8B0000', '#ff2222');
+    }
+
+    // 교차점 & 말
+    for (let i = 0; i < 24; i++) {
+        const [x, y] = p[i];
+
+        if (board[i]) {
+            const isP1 = board[i] === P1;
+
+            // 선택 링
+            if (selectedPiece === i) {
+                ctx.save();
+                ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 25;
+                ctx.strokeStyle = 'rgba(255,40,40,0.9)'; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(x, y, 28, 0, Math.PI*2); ctx.stroke();
+                ctx.setLineDash([3,3]);
+                ctx.strokeStyle = 'rgba(255,100,100,0.4)'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(x, y, 24, 0, Math.PI*2); ctx.stroke();
+                ctx.setLineDash([]); ctx.restore();
+            }
+
+            if (isP1) {
+                // P1 — 유령: 창백한 청백색, 안쪽에서 빛이 새어나오는 느낌
+                ctx.save();
+                ctx.shadowColor = 'rgba(180,220,255,0.9)';
+                ctx.shadowBlur = 22;
+                const g = ctx.createRadialGradient(x, y, 0, x, y, 20);
+                g.addColorStop(0, 'rgba(255,255,255,0.95)');
+                g.addColorStop(0.4, 'rgba(180,215,255,0.85)');
+                g.addColorStop(0.75, 'rgba(100,160,230,0.7)');
+                g.addColorStop(1, 'rgba(40,80,160,0.3)');
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI*2); ctx.fill();
+                // 외곽 희미한 테두리
+                ctx.strokeStyle = 'rgba(200,230,255,0.5)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI*2); ctx.stroke();
+                // 눈 — 작고 검은 두 점
+                ctx.fillStyle = 'rgba(20,40,100,0.85)';
+                ctx.beginPath(); ctx.arc(x-5, y-2, 3, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x+5, y-2, 3, 0, Math.PI*2); ctx.fill();
+                // 눈 하이라이트
+                ctx.fillStyle = 'rgba(180,220,255,0.7)';
+                ctx.beginPath(); ctx.arc(x-4, y-3, 1, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x+6, y-3, 1, 0, Math.PI*2); ctx.fill();
+                ctx.restore();
+
+            } else {
+                // P2 — 불씨: 검붉은 어둠 속에 타오르는 내부 불꽃
+                ctx.save();
+                ctx.shadowColor = 'rgba(200,0,0,0.9)';
+                ctx.shadowBlur = 24;
+                // 외곽 — 거의 검정
+                const go = ctx.createRadialGradient(x, y, 14, x, y, 22);
+                go.addColorStop(0, 'rgba(80,0,0,0.0)');
+                go.addColorStop(1, 'rgba(10,0,0,0.7)');
+                ctx.fillStyle = go;
+                ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI*2); ctx.fill();
+                // 내부 불꽃 코어
+                const gf = ctx.createRadialGradient(x, y+2, 0, x, y, 18);
+                gf.addColorStop(0, 'rgba(255,200,60,0.95)');
+                gf.addColorStop(0.3, 'rgba(220,50,0,0.9)');
+                gf.addColorStop(0.65, 'rgba(140,0,0,0.85)');
+                gf.addColorStop(1, 'rgba(20,0,0,0.9)');
+                ctx.fillStyle = gf;
+                ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI*2); ctx.fill();
+                // 눈 — 빨간 광채
+                ctx.shadowColor = '#ff2000'; ctx.shadowBlur = 10;
+                ctx.fillStyle = 'rgba(255,60,0,0.95)';
+                ctx.beginPath(); ctx.arc(x-5, y-2, 3.5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x+5, y-2, 3.5, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = 'rgba(255,220,100,0.7)';
+                ctx.beginPath(); ctx.arc(x-4.5, y-2.5, 1.2, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x+5.5, y-2.5, 1.2, 0, Math.PI*2); ctx.fill();
+                ctx.restore();
+            }
+
+        } else {
+            // 빈 교차점 — 핏빛 십자
+            ctx.save();
+            ctx.shadowColor = 'rgba(150,0,0,0.6)'; ctx.shadowBlur = 5;
+            ctx.strokeStyle = 'rgba(130,20,20,0.65)'; ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x-6,y); ctx.lineTo(x+6,y);
+            ctx.moveTo(x,y-6); ctx.lineTo(x,y+6);
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(150,0,0,0.7)';
+            ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2); ctx.fill();
+            ctx.restore();
+        }
+
+        ctx.fillStyle = 'rgba(180,50,50,0.45)';
+        ctx.font = 'bold 10px monospace';
+        ctx.fillText((i+1).toString(), x+11, y+20);
+    }
+}
+
+function drawHorrorMill(mill, colorA, colorB) {
+    const [a, b, c] = mill.map(i => p[i]);
+    const grad = ctx.createLinearGradient(a[0], a[1], c[0], c[1]);
+    grad.addColorStop(0, colorA); grad.addColorStop(0.5, colorB); grad.addColorStop(1, colorA);
+    ctx.save();
+    ctx.shadowColor = colorB; ctx.shadowBlur = 20;
+    ctx.strokeStyle = grad; ctx.lineWidth = 5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.lineTo(c[0],c[1]);
+    ctx.stroke();
+    ctx.restore();
+}
+
+
+// ── 사이버 테마 보드 ──
+function drawCyber() {
+    const W = 500;
+    ctx.clearRect(0, 0, W, W);
+
+    ctx.fillStyle = '#0a0f1e';
+    ctx.fillRect(0, 0, W, W);
+
+    ctx.strokeStyle = 'rgba(0,200,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= W; x += 25) {
+        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,W); ctx.stroke();
+    }
+    for (let y = 0; y <= W; y += 25) {
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
+
+    const corners = [[0,0],[W,0],[W,W],[0,W]];
+    const cLen = 18;
+    ctx.strokeStyle = 'rgba(0,200,255,0.35)';
+    ctx.lineWidth = 2;
+    corners.forEach(([cx,cy]) => {
+        const sx = cx === 0 ? 1 : -1, sy = cy === 0 ? 1 : -1;
+        ctx.beginPath();
+        ctx.moveTo(cx+sx*cLen, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy+sy*cLen);
+        ctx.stroke();
+    });
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,200,255,0.6)';
+    ctx.shadowBlur = 8;
+    ctx.strokeStyle = 'rgba(0,200,255,0.25)';
+    ctx.lineWidth = 4;
+    lines.forEach(([a,b]) => { ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke(); });
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(0,200,255,0.55)';
+    ctx.lineWidth = 1.5;
+    lines.forEach(([a,b]) => { ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke(); });
+
+    for (const mill of mills) {
+        if (mill.every(i => board[i] === P1)) drawMillGlow(mill, '#00eaff', '#7b2fff');
+        else if (mill.every(i => board[i] === P2)) drawMillGlow(mill, '#ff3a6e', '#ff8c00');
+    }
+
+    for (let i = 0; i < 24; i++) {
+        const [x, y] = p[i];
+        if (board[i]) {
+            const isP1 = board[i] === P1;
+            // 선택 링
+            if (selectedPiece === i) {
+                ctx.save();
+                ctx.shadowColor = '#f1c40f'; ctx.shadowBlur = 20;
+                ctx.strokeStyle = '#f1c40f'; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(x, y, 26, 0, Math.PI*2); ctx.stroke();
+                ctx.setLineDash([4,4]);
+                ctx.strokeStyle = 'rgba(241,196,15,0.5)'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI*2); ctx.stroke();
+                ctx.setLineDash([]); ctx.restore();
+            }
+            // 육각형 말 (헥사곤)
+            const R = 18;
+            ctx.save();
+            ctx.shadowColor = isP1 ? '#00eaff' : '#ff3a6e';
+            ctx.shadowBlur = 18;
+            // 외곽 글로우 링
+            ctx.strokeStyle = isP1 ? 'rgba(0,220,255,0.6)' : 'rgba(255,50,100,0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            for (let k=0;k<6;k++) {
+                const a = Math.PI/6 + k*Math.PI/3;
+                k===0 ? ctx.moveTo(x+R*1.2*Math.cos(a), y+R*1.2*Math.sin(a))
+                      : ctx.lineTo(x+R*1.2*Math.cos(a), y+R*1.2*Math.sin(a));
+            }
+            ctx.closePath(); ctx.stroke();
+            ctx.restore();
+            // 본체 헥사곤
+            const grad = ctx.createRadialGradient(x-4, y-4, 2, x, y, R);
+            if (isP1) {
+                grad.addColorStop(0, '#a0e4ff'); grad.addColorStop(0.5, '#0080cc'); grad.addColorStop(1, '#002244');
+            } else {
+                grad.addColorStop(0, '#ffb0c0'); grad.addColorStop(0.5, '#cc0040'); grad.addColorStop(1, '#220008');
+            }
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            for (let k=0;k<6;k++) {
+                const a = Math.PI/6 + k*Math.PI/3;
+                k===0 ? ctx.moveTo(x+R*Math.cos(a), y+R*Math.sin(a))
+                      : ctx.lineTo(x+R*Math.cos(a), y+R*Math.sin(a));
+            }
+            ctx.closePath(); ctx.fill();
+            // 내부 이진수 텍스트
+            ctx.save();
+            ctx.clip();
+            ctx.fillStyle = isP1 ? 'rgba(0,255,200,0.35)' : 'rgba(255,100,100,0.35)';
+            ctx.font = '5px monospace';
+            const bits = ['10','01','11','00'];
+            for (let r=-2;r<=2;r++) {
+                ctx.fillText(bits[Math.abs(r)%4], x-7, y+r*5);
+            }
+            ctx.restore();
+        } else {
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,200,255,0.5)'; ctx.shadowBlur = 6;
+            ctx.strokeStyle = 'rgba(0,200,255,0.6)'; ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x, y-7); ctx.lineTo(x+7, y); ctx.lineTo(x, y+7); ctx.lineTo(x-7, y);
+            ctx.closePath(); ctx.stroke();
+            ctx.fillStyle = 'rgba(0,200,255,0.8)';
+            ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+        }
+        ctx.fillStyle = 'rgba(0,200,255,0.4)'; ctx.font = 'bold 10px monospace';
+        ctx.fillText((i+1).toString(), x+11, y+20);
+    }
+}
+
+function drawMillGlow(mill, colorA, colorB) {
+    const [a, b, c] = mill.map(i => p[i]);
+    const grad = ctx.createLinearGradient(a[0], a[1], c[0], c[1]);
+    grad.addColorStop(0, colorA); grad.addColorStop(0.5, colorB); grad.addColorStop(1, colorA);
+    ctx.save();
+    ctx.shadowColor = colorA; ctx.shadowBlur = 18;
+    ctx.strokeStyle = grad; ctx.lineWidth = 5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.lineTo(c[0],c[1]);
+    ctx.stroke();
+    ctx.restore();
+}
+
+function highlightMill(mill, color) {
+    drawMillGlow(mill, color, color);
+}
+
+function aiTurn() {
+    if (gameOver) return;
+    const aiP = currentPlayer;
+
+    if (phase === "placing") {
+        let move = lookupOpeningBook(board, aiP);
+        if (move !== null) setAiInfo('Opening Book 사용');
+        else move = iterativeDeepening(true, aiP);
+
+        if (move === null) { endGame("AI 배치 실패"); return; }
+
+        board[move] = aiP;
+        placed[aiP]++;
+
+        if (isMill(move, aiP)) {
+            const targets = getRemovableTargets(aiP);
+            const remIdx = chooseBestRemoval(aiP, targets);
+            board[remIdx] = EMPTY;
+            logMove('.', move, aiP, remIdx);
+        } else {
+            logMove('.', move, aiP, '.');
+        }
+
+        if (placed[1] === 9 && placed[2] === 9) { phase = "moving"; noCaptureTurns = 0; }
+        draw();
+        // AI 수 완료 후 스냅샷 저장 (사람이 무르기 누르면 여기서 복원)
+        if (mode !== 'aivai') saveSnapshot();
+        updateUndoButton();
+        switchTurn();
+
+    } else if (phase === "moving") {
+        const best = iterativeDeepening(false, aiP);
+        if (!best) { endGame(aiP === P1 ? "1P 이동 불가 패배!" : "2P 이동 불가 패배!"); return; }
+
+        board[best.from] = EMPTY;
+        board[best.to]   = aiP;
+
+        if (isMill(best.to, aiP)) {
+            const targets = getRemovableTargets(aiP);
+            const remIdx = chooseBestRemoval(aiP, targets);
+            board[remIdx] = EMPTY;
+            logMove(best.from, best.to, aiP, remIdx);
+            noCaptureTurns = 0;
+        } else {
+            logMove(best.from, best.to, aiP, '.');
+            noCaptureTurns++;
+        }
+
+        draw();
+        // AI 수 완료 후 스냅샷 저장
+        if (mode !== 'aivai') saveSnapshot();
+        updateUndoButton();
+        switchTurn();
+    }
+}
+
+// 제거 대상 선택: 상대 밀 잠재성이 가장 높은 말 우선
+function chooseBestRemoval(aiPlayer, targets) {
+    const opp = aiPlayer === P1 ? P2 : P1;
+    let best = targets[0], bestScore = -1;
+    for (const t of targets) {
+        let score = 0;
+        for (const m of mills) {
+            if (!m.includes(t)) continue;
+            score += m.filter(i => board[i] === opp).length;
+        }
+        if (score > bestScore) { bestScore = score; best = t; }
+    }
+    return best;
+}
+
+canvas.addEventListener("click", e => {
+    if (isAI() || gameOver) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    let idx = -1;
+    for (let i = 0; i < 24; i++) {
+        if (Math.hypot(p[i][0] - x, p[i][1] - y) < 20) { idx = i; break; }
+    }
+    if (idx === -1) return;
+
+    if (phase === "placing") {
+        if (board[idx] === EMPTY) {
+            saveSnapshot(); // 수 두기 직전 저장
+            board[idx] = currentPlayer;
+            placed[currentPlayer]++;
+            if (isMill(idx, currentPlayer)) {
+                logMove('.', idx, currentPlayer, 'pending');
+                phase = "removing";
+                removingPlayer = currentPlayer;
+            } else {
+                logMove('.', idx, currentPlayer, '.');
+                if (placed[1] === 9 && placed[2] === 9) { phase = "moving"; noCaptureTurns = 0; }
+                switchTurn();
+            }
+            draw(); updateStatus(); updateDrawCounter(); updateUndoButton();
+        }
+    } else if (phase === "removing") {
+        if (getRemovableTargets(removingPlayer).includes(idx)) {
+            // removing은 placing/moving과 한 세트 — 별도 스냅샷 없이 진행
+            board[idx] = EMPTY;
+            if (gameLog.length > 0) gameLog[gameLog.length - 1].removed = idx + 1;
+            const nextPhase = (placed[1] === 9 && placed[2] === 9) ? "moving" : "placing";
+            if (nextPhase === 'moving') noCaptureTurns = 0;
+            phase = nextPhase;
+            removingPlayer = null;
+            draw();
+            updateDrawCounter();
+            switchTurn();
+        }
+    } else if (phase === "moving") {
+        if (selectedPiece === null) {
+            if (board[idx] === currentPlayer) { selectedPiece = idx; draw(); }
+        } else {
+            const isFly = board.filter(v => v === currentPlayer).length === 3;
+            const adjacent = adj[selectedPiece].includes(idx);
+            if (board[idx] === EMPTY && (isFly || adjacent)) {
+                saveSnapshot(); // 수 두기 직전 저장
+                const from = selectedPiece;
+                board[from] = EMPTY;
+                board[idx] = currentPlayer;
+                selectedPiece = null;
+                if (isMill(idx, currentPlayer)) {
+                    logMove(from, idx, currentPlayer, 'pending');
+                    phase = "removing";
+                    removingPlayer = currentPlayer;
+                } else {
+                    logMove(from, idx, currentPlayer, '.');
+                    noCaptureTurns++;
+                    updateDrawCounter();
+                    switchTurn();
+                }
+                draw(); updateStatus(); updateUndoButton();
+            } else {
+                selectedPiece = null; draw();
+            }
+        }
+    }
+});
+
+function updateDrawCounter() {
+    const el = document.getElementById('draw-counter');
+    // 놓기 단계 중이거나 게임 없으면 숨김
+    if (!phase || phase === 'placing' || gameOver) {
+        el.classList.add('hidden'); return;
+    }
+    const turns = Math.floor(noCaptureTurns / 2); // 하프턴 → 양쪽 모두 1턴 완료 기준
+    el.classList.remove('hidden');
+    el.classList.toggle('warn', turns >= 40);
+    el.textContent = `교착 상태: ${turns} / 50턴`;
+}
+
+function switchTurn() {
+    if (gameOver) return;
+    const opponent = currentPlayer === P1 ? P2 : P1;
+
+    if (placed[1] === 9 && placed[2] === 9) {
+        if (board.filter(v => v === opponent).length <= 2) {
+            endGame((opponent === P1 ? "1P" : "2P") + " 패배! (말 부족)"); return;
+        }
+        if (getMovesForPlayer(opponent, board).length === 0) {
+            endGame((opponent === P1 ? "1P" : "2P") + " 패배! (이동 불가)"); return;
+        }
+    }
+
+    // 무승부 규칙: 이동 단계에서 양 플레이어 각각 50턴(= 하프턴 100번) 동안 말 제거 없으면 무승부
+    if (phase === 'moving' && noCaptureTurns >= 100) {
+        endGame("무승부! (50턴 무제거)"); return;
+    }
+
+    currentPlayer = opponent;
+    updateStatus();
+    updateDrawCounter();
+    // AI vs AI는 0.3초 딜레이, 일반 AI는 0.1초
+    if (isAI()) setTimeout(aiTurn, mode === 'aivai' ? 300 : 100);
+}
+
+function updatePiecePanel() {
+    if (!board) return;
+    const p1 = board.filter(v => v === P1).length || (placed && placed[1] < 9 ? placed[1] : 0);
+    const p2 = board.filter(v => v === P2).length || (placed && placed[2] < 9 ? placed[2] : 0);
+    const p1el = document.getElementById('p1-count');
+    const p2el = document.getElementById('p2-count');
+    if (p1el) p1el.textContent = board ? board.filter(v => v === P1).length : 0;
+    if (p2el) p2el.textContent = board ? board.filter(v => v === P2).length : 0;
+}
+
+function updateStatus() {
+    if (gameOver) return;
+    const s = document.getElementById("status");
+    s.classList.remove("blink", "turn-p1", "turn-p2", "turn-warn");
+    if (phase === "removing") {
+        s.textContent = "⚡ 제거할 말을 클릭하세요";
+        s.classList.add("blink", "turn-warn");
+    } else {
+        let label;
+        if (mode === 'pvp')        label = currentPlayer === P1 ? "1P 차례" : "2P 차례";
+        else if (mode === 'aivai') label = currentPlayer === P1 ? "AI 파랑 차례" : "AI 빨강 차례";
+        else                       label = currentPlayer === userSide ? "내 차례" : "AI 생각 중...";
+        s.textContent = `${label}  (${phase})`;
+        s.classList.add(currentPlayer === P1 ? 'turn-p1' : 'turn-p2');
+    }
+    updatePiecePanel();
+}
+
+function endGame(reason) {
+    gameOver = true;
+    const s = document.getElementById("status");
+    s.classList.remove("blink","turn-p1","turn-p2","turn-warn");
+    s.textContent = "🏆 " + reason;
+    document.getElementById("draw-counter").classList.add('hidden');
+    document.getElementById("menu").innerHTML =
+        `<button onclick="saveData()" style="font-size:0.82em;padding:8px 14px;">💾 저장</button>` +
+        `<button onclick="showMainMenu()" style="font-size:0.82em;padding:8px 14px;">← 메뉴</button>`;
+}
+
+function logMove(from, to, player, removed = '.') {
+    let label;
+    if (mode === 'pvp')    label = player === P1 ? "1P" : "2P";
+    else if (mode === 'aivai') label = player === P1 ? "AI(파랑)" : "AI(빨강)";
+    else                   label = player === userSide ? "사용자" : "AI";
+    gameLog.push({
+        player: label,
+        from: from === '.' ? '.' : from + 1,
+        to: to + 1,
+        removed: removed === '.' ? '.' : (removed === 'pending' ? 'pending' : removed + 1),
+        remaining: board.filter(v => v === player).length,
+        mode: phase
+    });
+}
+
+function saveData() {
+    let csv = '플레이어,있던 위치,놓은 위치,제거한 위치,남은 말 수,모드\n';
+    csv += gameLog.map(e => `${e.player},${e.from},${e.to},${e.removed},${e.remaining},${e.mode}`).join('\n');
+    const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = '9men_log.csv'; a.click();
+    URL.revokeObjectURL(url);
+}
+
+function showMainMenu() {
+    document.getElementById("menu").innerHTML = `
+        <button class="menu-card" onclick="showAIMenu()">
+          <span class="card-icon">🤖</span>
+          <span class="card-label">AI 모드</span>
+          <span class="card-sub">vs AI</span>
+        </button>
+        <button class="menu-card" onclick="startGame('pvp',1)">
+          <span class="card-icon">🎮</span>
+          <span class="card-label">PVP 모드</span>
+          <span class="card-sub">2인 대전</span>
+        </button>
+        <button class="menu-card" onclick="showTutorial()">
+          <span class="card-icon">📖</span>
+          <span class="card-label">게임 규칙</span>
+          <span class="card-sub">튜토리얼</span>
+        </button>
+        <button class="menu-card" onclick="showReplay()">
+          <span class="card-icon">🎬</span>
+          <span class="card-label">다시보기</span>
+          <span class="card-sub">CSV 재생</span>
+        </button>
+    `;
+    resetState();
+}
+
+function resetState() {
+    board = Array(24).fill(EMPTY);
+    placed = {1:0, 2:0};
+    phase = null; currentPlayer = null;
+    gameOver = false; gameLog = [];
+    mode = null; selectedPiece = null;
+    noCaptureTurns = 0;
+    historyStack = [];
+    ttClear();
+    draw();
+    setAiInfo('');
+    document.getElementById("draw-counter").classList.add('hidden');
+    document.getElementById("piece-panel").classList.remove('visible');
+    const s = document.getElementById("status");
+    s.classList.remove("blink","turn-p1","turn-p2","turn-warn");
+    s.textContent = "모드를 선택하여 시작하세요.";
+}
+
+// ============================================================
+// 튜토리얼 로직
+// ============================================================
+let tutCurrentSlide = 0;
+const TUT_TOTAL = 9;
+
+function showTutorial() {
+    tutCurrentSlide = 0;
+    buildTutDots();
+    updateTutSlide();
+    document.getElementById('tutorial-overlay').classList.add('show');
+}
+
+function closeTutorial() {
+    document.getElementById('tutorial-overlay').classList.remove('show');
+}
+
+function buildTutDots() {
+    const dots = document.getElementById('tut-dots');
+    dots.innerHTML = '';
+    for (let i = 0; i < TUT_TOTAL; i++) {
+        const d = document.createElement('div');
+        d.className = 'tut-dot' + (i === 0 ? ' active' : '');
+        d.onclick = (function(idx){ return function(){ tutGoTo(idx); }; })(i);
+        d.style.cursor = 'pointer';
+        dots.appendChild(d);
+    }
+}
+
+function updateTutSlide() {
+    // 슬라이드 표시 전환
+    document.querySelectorAll('.tut-slide').forEach((el, i) => {
+        el.classList.toggle('active', i === tutCurrentSlide);
+    });
+    // 도트 강조
+    document.querySelectorAll('.tut-dot').forEach((el, i) => {
+        el.classList.toggle('active', i === tutCurrentSlide);
+    });
+    // 스텝 라벨
+    document.getElementById('tut-step-label').innerText =
+        (tutCurrentSlide + 1) + ' / ' + TUT_TOTAL;
+    // 버튼 텍스트 변경
+    const nextBtn = document.getElementById('tut-next-btn');
+    const prevBtn = document.getElementById('tut-prev-btn');
+    nextBtn.innerText = tutCurrentSlide === TUT_TOTAL - 1 ? '✅ 시작하기' : '다음 ▶';
+    prevBtn.disabled = tutCurrentSlide === 0;
+    prevBtn.style.opacity = tutCurrentSlide === 0 ? '0.35' : '1';
+}
+
+function tutNext() {
+    if (tutCurrentSlide < TUT_TOTAL - 1) {
+        tutCurrentSlide++;
+        updateTutSlide();
+    } else {
+        closeTutorial();
+    }
+}
+
+function tutPrev() {
+    if (tutCurrentSlide > 0) {
+        tutCurrentSlide--;
+        updateTutSlide();
+    }
+}
+
+function tutGoTo(idx) {
+    tutCurrentSlide = idx;
+    updateTutSlide();
+}
+
+// ============================================================
+// 리플레이 시스템
+// CSV 파싱 → 각 수를 순서대로 board에 적용해 스냅샷 배열 생성
+// 방향키 / 버튼으로 스냅샷 간 이동
+// ============================================================
+let replaySnapshots = [];  // { board, moveDesc, player, stepNum }
+let replayIdx = 0;
+let replayCanvas, replayCtx;
+
+function showReplay() {
+    document.getElementById('replay-upload-area').style.display = 'block';
+    document.getElementById('replay-controls').style.display = 'none';
+    document.getElementById('replay-overlay').classList.add('show');
+    replaySnapshots = [];
+    replayIdx = 0;
+}
+
+function closeReplay() {
+    document.getElementById('replay-overlay').classList.remove('show');
+}
+
+// 드래그 앤 드롭도 지원
+document.addEventListener('DOMContentLoaded', () => {
+    const area = document.getElementById('replay-upload-area');
+    if (!area) return;
+    area.addEventListener('dragover', e => { e.preventDefault(); area.style.borderColor = '#16a085'; });
+    area.addEventListener('dragleave', () => { area.style.borderColor = '#bbb'; });
+    area.addEventListener('drop', e => {
+        e.preventDefault();
+        area.style.borderColor = '#bbb';
+        const file = e.dataTransfer.files[0];
+        if (file) parseReplayFile(file);
+    });
+});
+
+function loadReplayCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    parseReplayFile(file);
+    event.target.value = '';
+}
+
+// parseReplayFile 내부에서 직접 호출하도록 재정의
+function parseReplayFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            let text = e.target.result.replace(/^\uFEFF/, '');
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) throw new Error('데이터가 없습니다');
+
+            const moves = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',');
+                if (cols.length < 6) continue;
+                moves.push({
+                    player:  cols[0].trim(),
+                    from:    cols[1].trim(),
+                    to:      cols[2].trim(),
+                    removed: cols[3].trim(),
+                    phase:   cols[5].trim()
+                });
+            }
+            if (moves.length === 0) throw new Error('수 데이터가 없습니다');
+            const maxIdx = Math.max(0, ...moves.flatMap(mv => [mv.to, mv.from, mv.removed].filter(v => v !== '.' && v !== 'pending').map(Number)));
+            if (maxIdx > 24) throw new Error('다른 게임의 기록 파일입니다');
+
+            // 스냅샷 배열 생성
+            // player 이름에서 P1/P2 판단: "1P", "AI(파랑)", "사용자"(선공이면 P1)
+            // → 첫 수 player를 P1로 고정하고 번갈아 매핑
+            replaySnapshots = [];
+            const rb = Array(24).fill(EMPTY);
+            const rPlaced = {1: 0, 2: 0};
+
+            // 초기 상태 스냅샷
+            replaySnapshots.push({
+                board: rb.slice(),
+                desc: '시작 — 말을 놓기 전',
+                player: '',
+                highlight: null,   // 이번 수에서 변경된 위치들
+                removed: null
+            });
+
+            // 플레이어 이름 → P1/P2 매핑 (첫 등장 순서대로)
+            const playerMap = {};
+            let playerCount = 0;
+
+            for (const mv of moves) {
+                // 플레이어 매핑
+                if (!(mv.player in playerMap)) {
+                    playerCount++;
+                    playerMap[mv.player] = playerCount === 1 ? P1 : P2;
+                }
+                const pNum = playerMap[mv.player];
+                const color = pNum === P1 ? '파랑' : '빨강';
+
+                const toIdx   = parseInt(mv.to) - 1;      // 0-based
+                const fromIdx = mv.from === '.' ? -1 : parseInt(mv.from) - 1;
+                const remIdx  = (mv.removed === '.' || mv.removed === 'pending')
+                                ? -1 : parseInt(mv.removed) - 1;
+
+                // board 적용
+                if (fromIdx === -1) {
+                    // placing
+                    rb[toIdx] = pNum;
+                    rPlaced[pNum]++;
+                } else {
+                    // moving
+                    rb[fromIdx] = EMPTY;
+                    rb[toIdx] = pNum;
+                }
+                if (remIdx !== -1) rb[remIdx] = EMPTY;
+
+                // 설명 문자열
+                let desc = `${mv.player} (${color}) — `;
+                if (fromIdx === -1) {
+                    desc += `${mv.to}번에 놓음`;
+                } else {
+                    desc += `${mv.from}번 → ${mv.to}번 이동`;
+                }
+                if (remIdx !== -1) desc += ` · ${mv.removed}번 제거`;
+
+                replaySnapshots.push({
+                    board: rb.slice(),
+                    desc,
+                    player: pNum,
+                    highlight: fromIdx === -1
+                        ? [toIdx]
+                        : [fromIdx, toIdx],
+                    removed: remIdx !== -1 ? remIdx : null
+                });
+            }
+
+            // 리플레이 캔버스 초기화
+            replayCanvas = document.getElementById('replay-canvas');
+            replayCtx    = replayCanvas.getContext('2d');
+
+            replayIdx = 0;
+            document.getElementById('replay-upload-area').style.display = 'none';
+            document.getElementById('replay-controls').style.display = 'block';
+            replayDraw();
+            replayUpdateUI();
+
+        } catch (err) {
+            alert('CSV 파일을 읽는 중 오류가 발생했습니다: ' + err.message);
+        }
+    };
+    reader.readAsText(file, 'utf-8');
+}
+
+// 리플레이 보드 그리기 (400×400 캔버스)
+const rScale = 400 / 500;
+function replayDraw() {
+    if (!replayCtx) return;
+    if (currentTheme === 'cyber')            replayDrawCyber();
+    else if (currentTheme === 'bauhaus')     replayDrawBauhaus();
+    else if (currentTheme === 'horror')      replayDrawHorror();
+    else if (currentTheme === 'claymorphism') replayDrawClassic();
+    else replayDrawClassic();
+}
+
+function replayDrawClassic() {
+    const snap = replaySnapshots[replayIdx];
+    const rc = replayCtx;
+    const W = 400;
+    rc.clearRect(0, 0, W, W);
+    rc.fillStyle = '#fff'; rc.fillRect(0, 0, W, W);
+
+    rc.strokeStyle = '#333'; rc.lineWidth = 1.5;
+    lines.forEach(([a, b]) => {
+        rc.beginPath();
+        rc.moveTo(p[a][0]*rScale, p[a][1]*rScale);
+        rc.lineTo(p[b][0]*rScale, p[b][1]*rScale);
+        rc.stroke();
+    });
+
+    for (const mill of mills) {
+        const color = mill.every(i => snap.board[i] === P1) ? '#3498db'
+                    : mill.every(i => snap.board[i] === P2) ? '#e74c3c' : null;
+        if (color) {
+            rc.strokeStyle = color; rc.lineWidth = 4;
+            rc.beginPath();
+            rc.moveTo(p[mill[0]][0]*rScale, p[mill[0]][1]*rScale);
+            rc.lineTo(p[mill[1]][0]*rScale, p[mill[1]][1]*rScale);
+            rc.lineTo(p[mill[2]][0]*rScale, p[mill[2]][1]*rScale);
+            rc.stroke();
+        }
+    }
+
+    if (snap.highlight && snap.highlight.length === 2) {
+        const [hf, ht] = snap.highlight;
+        rc.strokeStyle = '#f1c40f'; rc.lineWidth = 2; rc.setLineDash([4,3]);
+        rc.beginPath();
+        rc.moveTo(p[hf][0]*rScale, p[hf][1]*rScale);
+        rc.lineTo(p[ht][0]*rScale, p[ht][1]*rScale);
+        rc.stroke(); rc.setLineDash([]);
+    }
+
+    for (let i = 0; i < 24; i++) {
+        const x = p[i][0]*rScale, y = p[i][1]*rScale;
+        const r = 14*rScale;
+        const isHL = snap.highlight && snap.highlight.includes(i);
+        if (isHL) {
+            rc.fillStyle = 'rgba(241,196,15,0.2)';
+            rc.beginPath(); rc.arc(x, y, r+5, 0, Math.PI*2); rc.fill();
+        }
+        rc.fillStyle = '#333';
+        rc.beginPath(); rc.arc(x, y, 5*rScale, 0, Math.PI*2); rc.fill();
+        if (snap.board[i]) {
+            rc.fillStyle = snap.board[i] === P1 ? '#3498db' : '#e74c3c';
+            rc.beginPath(); rc.arc(x, y, r, 0, Math.PI*2); rc.fill();
+            rc.strokeStyle = '#fff'; rc.lineWidth = 1.5; rc.stroke();
+        }
+        if (snap.removed === i) {
+            rc.strokeStyle = '#e74c3c'; rc.lineWidth = 2;
+            const d = 8*rScale;
+            rc.beginPath(); rc.moveTo(x-d,y-d); rc.lineTo(x+d,y+d); rc.stroke();
+            rc.beginPath(); rc.moveTo(x+d,y-d); rc.lineTo(x-d,y+d); rc.stroke();
+        }
+        rc.fillStyle = '#888'; rc.font = `bold ${10*rScale}px Arial`;
+        rc.fillText((i+1).toString(), x+7*rScale, y+14*rScale);
+    }
+}
+
+function replayDrawBauhaus() {
+    const snap = replaySnapshots[replayIdx];
+    const rc = replayCtx;
+    const W = 400;
+    rc.clearRect(0, 0, W, W);
+
+    // 배경
+    rc.fillStyle = '#faf8f3'; rc.fillRect(0, 0, W, W);
+    rc.fillStyle = 'rgba(214,40,40,0.07)';
+    rc.beginPath(); rc.arc(0, 0, 140*rScale, 0, Math.PI*2); rc.fill();
+    rc.fillStyle = 'rgba(0,63,136,0.06)';
+    rc.beginPath(); rc.arc(W, W, 160*rScale, 0, Math.PI*2); rc.fill();
+
+    // 선
+    rc.strokeStyle = '#111'; rc.lineWidth = 2.5;
+    lines.forEach(([a, b]) => {
+        rc.beginPath();
+        rc.moveTo(p[a][0]*rScale, p[a][1]*rScale);
+        rc.lineTo(p[b][0]*rScale, p[b][1]*rScale);
+        rc.stroke();
+    });
+
+    // 밀 강조
+    for (const mill of mills) {
+        const color = mill.every(i => snap.board[i] === P1) ? '#003F88'
+                    : mill.every(i => snap.board[i] === P2) ? '#D62828' : null;
+        if (color) {
+            rc.strokeStyle = color; rc.lineWidth = 6; rc.lineCap = 'square';
+            rc.beginPath();
+            rc.moveTo(p[mill[0]][0]*rScale, p[mill[0]][1]*rScale);
+            rc.lineTo(p[mill[1]][0]*rScale, p[mill[1]][1]*rScale);
+            rc.lineTo(p[mill[2]][0]*rScale, p[mill[2]][1]*rScale);
+            rc.stroke(); rc.lineCap = 'butt';
+        }
+    }
+
+    // 이동 경로
+    if (snap.highlight && snap.highlight.length === 2) {
+        const [hf, ht] = snap.highlight;
+        rc.strokeStyle = '#FFDD00'; rc.lineWidth = 4;
+        rc.setLineDash([6, 3]);
+        rc.beginPath();
+        rc.moveTo(p[hf][0]*rScale, p[hf][1]*rScale);
+        rc.lineTo(p[ht][0]*rScale, p[ht][1]*rScale);
+        rc.stroke(); rc.setLineDash([]);
+    }
+
+    // 점 + 말
+    for (let i = 0; i < 24; i++) {
+        const x = p[i][0]*rScale, y = p[i][1]*rScale;
+        const r = 16*rScale;
+        const isHL = snap.highlight && snap.highlight.includes(i);
+
+        if (snap.board[i]) {
+            const isP1 = snap.board[i] === P1;
+            if (isHL) {
+                rc.fillStyle = '#FFDD00';
+                rc.fillRect(x-r-4, y-r-4, (r+4)*2, (r+4)*2);
+                rc.strokeStyle = '#111'; rc.lineWidth = 2;
+                rc.strokeRect(x-r-4, y-r-4, (r+4)*2, (r+4)*2);
+            }
+            rc.fillStyle = isP1 ? '#003F88' : '#D62828';
+            rc.beginPath(); rc.arc(x, y, r, 0, Math.PI*2); rc.fill();
+            rc.strokeStyle = '#111'; rc.lineWidth = 2;
+            rc.beginPath(); rc.arc(x, y, r, 0, Math.PI*2); rc.stroke();
+        } else {
+            rc.fillStyle = isHL ? '#FFDD00' : '#111';
+            rc.fillRect(x - 4*rScale, y - 4*rScale, 8*rScale, 8*rScale);
+        }
+
+        if (snap.removed === i) {
+            rc.strokeStyle = '#D62828'; rc.lineWidth = 3;
+            const d = 9*rScale;
+            rc.beginPath(); rc.moveTo(x-d,y-d); rc.lineTo(x+d,y+d); rc.stroke();
+            rc.beginPath(); rc.moveTo(x+d,y-d); rc.lineTo(x-d,y+d); rc.stroke();
+        }
+
+        rc.fillStyle = 'rgba(0,0,0,0.3)'; rc.font = `bold ${9*rScale}px Arial`;
+        rc.fillText((i+1).toString(), x+7*rScale, y+14*rScale);
+    }
+}
+
+function replayDrawHorror() {
+    const snap = replaySnapshots[replayIdx];
+    const rc = replayCtx;
+    const W = 400;
+    rc.clearRect(0, 0, W, W);
+
+    // 배경
+    rc.fillStyle = '#0d0008'; rc.fillRect(0, 0, W, W);
+    const bg = rc.createRadialGradient(W*0.2, W*0.2, 0, W*0.2, W*0.2, W*0.55);
+    bg.addColorStop(0, 'rgba(100,0,0,0.2)'); bg.addColorStop(1, 'rgba(0,0,0,0)');
+    rc.fillStyle = bg; rc.fillRect(0, 0, W, W);
+
+    // 선
+    rc.save();
+    rc.shadowColor = 'rgba(180,0,0,0.6)'; rc.shadowBlur = 8;
+    rc.strokeStyle = 'rgba(139,0,0,0.28)'; rc.lineWidth = 3;
+    lines.forEach(([a,b]) => {
+        rc.beginPath();
+        rc.moveTo(p[a][0]*rScale, p[a][1]*rScale);
+        rc.lineTo(p[b][0]*rScale, p[b][1]*rScale);
+        rc.stroke();
+    });
+    rc.restore();
+    rc.strokeStyle = 'rgba(160,30,30,0.6)'; rc.lineWidth = 1;
+    lines.forEach(([a,b]) => {
+        rc.beginPath();
+        rc.moveTo(p[a][0]*rScale, p[a][1]*rScale);
+        rc.lineTo(p[b][0]*rScale, p[b][1]*rScale);
+        rc.stroke();
+    });
+
+    // 밀 강조
+    for (const mill of mills) {
+        const [cA, cB] = mill.every(i => snap.board[i] === P1)
+            ? ['#3a7bd5','#00d2ff']
+            : mill.every(i => snap.board[i] === P2)
+            ? ['#8B0000','#ff2222'] : [null,null];
+        if (cA) {
+            const [a,b,c] = mill.map(i => [p[i][0]*rScale, p[i][1]*rScale]);
+            const g = rc.createLinearGradient(a[0],a[1],c[0],c[1]);
+            g.addColorStop(0,cA); g.addColorStop(0.5,cB); g.addColorStop(1,cA);
+            rc.save();
+            rc.shadowColor = cB; rc.shadowBlur = 14;
+            rc.strokeStyle = g; rc.lineWidth = 4; rc.lineCap = 'round';
+            rc.beginPath(); rc.moveTo(a[0],a[1]); rc.lineTo(b[0],b[1]); rc.lineTo(c[0],c[1]);
+            rc.stroke(); rc.restore();
+        }
+    }
+
+    // 이동 경로
+    if (snap.highlight && snap.highlight.length === 2) {
+        const [hf,ht] = snap.highlight;
+        rc.save();
+        rc.shadowColor = '#ff0000'; rc.shadowBlur = 8;
+        rc.strokeStyle = 'rgba(200,0,0,0.7)'; rc.lineWidth = 2;
+        rc.setLineDash([4,3]);
+        rc.beginPath();
+        rc.moveTo(p[hf][0]*rScale, p[hf][1]*rScale);
+        rc.lineTo(p[ht][0]*rScale, p[ht][1]*rScale);
+        rc.stroke(); rc.setLineDash([]); rc.restore();
+    }
+
+    // 점 + 말
+    for (let i = 0; i < 24; i++) {
+        const x = p[i][0]*rScale, y = p[i][1]*rScale;
+        const r = 14*rScale;
+        const isHL = snap.highlight && snap.highlight.includes(i);
+
+        if (snap.board[i]) {
+            const isP1 = snap.board[i] === P1;
+            if (isHL) {
+                rc.save();
+                rc.shadowColor = '#ff0000'; rc.shadowBlur = 16;
+                rc.strokeStyle = 'rgba(255,50,50,0.7)'; rc.lineWidth = 1.5;
+                rc.beginPath(); rc.arc(x,y,r+6,0,Math.PI*2); rc.stroke();
+                rc.restore();
+            }
+            rc.save();
+            rc.shadowColor = isP1 ? 'rgba(50,120,220,0.7)' : 'rgba(180,0,0,0.9)';
+            rc.shadowBlur = 14;
+            rc.strokeStyle = isP1 ? 'rgba(80,150,255,0.5)' : 'rgba(200,0,0,0.6)';
+            rc.lineWidth = 1.2;
+            rc.beginPath(); rc.arc(x,y,r+2,0,Math.PI*2); rc.stroke();
+            rc.restore();
+            const g = rc.createRadialGradient(x-3*rScale, y-4*rScale, 1, x, y, r);
+            if (isP1) {
+                g.addColorStop(0,'#aaddff'); g.addColorStop(0.45,'#1a5fb4'); g.addColorStop(1,'#060e20');
+            } else {
+                g.addColorStop(0,'#ff8888'); g.addColorStop(0.35,'#aa0000'); g.addColorStop(1,'#1a0000');
+            }
+            rc.fillStyle = g;
+            rc.beginPath(); rc.arc(x,y,r,0,Math.PI*2); rc.fill();
+        } else {
+            rc.save();
+            rc.shadowColor = 'rgba(150,0,0,0.5)'; rc.shadowBlur = 4;
+            rc.strokeStyle = isHL ? 'rgba(200,50,50,0.8)' : 'rgba(130,20,20,0.6)';
+            rc.lineWidth = 1.2;
+            rc.beginPath();
+            rc.moveTo(x-5*rScale,y); rc.lineTo(x+5*rScale,y);
+            rc.moveTo(x,y-5*rScale); rc.lineTo(x,y+5*rScale);
+            rc.stroke();
+            rc.fillStyle = 'rgba(150,0,0,0.65)';
+            rc.beginPath(); rc.arc(x,y,2*rScale,0,Math.PI*2); rc.fill();
+            rc.restore();
+        }
+
+        if (snap.removed === i) {
+            rc.save();
+            rc.shadowColor = '#ff0000'; rc.shadowBlur = 12;
+            rc.strokeStyle = '#cc0000'; rc.lineWidth = 2.5;
+            const d = 8*rScale;
+            rc.beginPath(); rc.moveTo(x-d,y-d); rc.lineTo(x+d,y+d); rc.stroke();
+            rc.beginPath(); rc.moveTo(x+d,y-d); rc.lineTo(x-d,y+d); rc.stroke();
+            rc.restore();
+        }
+
+        rc.fillStyle = 'rgba(180,50,50,0.4)';
+        rc.font = `bold ${9*rScale}px monospace`;
+        rc.fillText((i+1).toString(), x+7*rScale, y+14*rScale);
+    }
+}
+
+function replayDrawCyber() {
+    const snap = replaySnapshots[replayIdx];
+    const rc = replayCtx;
+    const W = 400;
+    rc.clearRect(0, 0, W, W);
+    rc.fillStyle = '#0a0f1e'; rc.fillRect(0, 0, W, W);
+
+    // 미세 격자
+    rc.strokeStyle = 'rgba(0,200,255,0.04)';
+    rc.lineWidth = 1;
+    for (let x = 0; x <= W; x += 20) {
+        rc.beginPath(); rc.moveTo(x,0); rc.lineTo(x,W); rc.stroke();
+    }
+    for (let y = 0; y <= W; y += 20) {
+        rc.beginPath(); rc.moveTo(0,y); rc.lineTo(W,y); rc.stroke();
+    }
+
+    // 선 글로우
+    rc.save();
+    rc.shadowColor = 'rgba(0,200,255,0.5)';
+    rc.shadowBlur = 6;
+    rc.strokeStyle = 'rgba(0,200,255,0.2)';
+    rc.lineWidth = 3;
+    lines.forEach(([a, b]) => {
+        rc.beginPath();
+        rc.moveTo(p[a][0]*rScale, p[a][1]*rScale);
+        rc.lineTo(p[b][0]*rScale, p[b][1]*rScale);
+        rc.stroke();
+    });
+    rc.restore();
+    rc.strokeStyle = 'rgba(0,200,255,0.5)';
+    rc.lineWidth = 1;
+    lines.forEach(([a, b]) => {
+        rc.beginPath();
+        rc.moveTo(p[a][0]*rScale, p[a][1]*rScale);
+        rc.lineTo(p[b][0]*rScale, p[b][1]*rScale);
+        rc.stroke();
+    });
+
+    // 밀 강조
+    for (const mill of mills) {
+        if (mill.every(i => snap.board[i] === P1)) replayHighlightMill(mill, '#00eaff', '#7b2fff');
+        else if (mill.every(i => snap.board[i] === P2)) replayHighlightMill(mill, '#ff3a6e', '#ff8c00');
+    }
+
+    // 이동 경로
+    if (snap.highlight && snap.highlight.length === 2) {
+        const [hf, ht] = snap.highlight;
+        rc.save();
+        rc.shadowColor = '#f1c40f';
+        rc.shadowBlur = 8;
+        rc.strokeStyle = '#f1c40f';
+        rc.lineWidth = 2;
+        rc.setLineDash([4, 3]);
+        rc.beginPath();
+        rc.moveTo(p[hf][0]*rScale, p[hf][1]*rScale);
+        rc.lineTo(p[ht][0]*rScale, p[ht][1]*rScale);
+        rc.stroke();
+        rc.setLineDash([]);
+        rc.restore();
+    }
+
+    // 점 + 말
+    for (let i = 0; i < 24; i++) {
+        const x = p[i][0]*rScale, y = p[i][1]*rScale;
+        const r = 14*rScale;
+        const isHL = snap.highlight && snap.highlight.includes(i);
+
+        if (snap.board[i]) {
+            const isP1 = snap.board[i] === P1;
+            if (isHL) {
+                rc.save();
+                rc.shadowColor = '#f1c40f';
+                rc.shadowBlur = 14;
+                rc.strokeStyle = '#f1c40f';
+                rc.lineWidth = 1.5;
+                rc.beginPath(); rc.arc(x, y, r+5, 0, Math.PI*2); rc.stroke();
+                rc.restore();
+            }
+            rc.save();
+            rc.shadowColor = isP1 ? 'rgba(0,150,255,0.7)' : 'rgba(255,50,80,0.7)';
+            rc.shadowBlur = 12;
+            rc.strokeStyle = isP1 ? 'rgba(100,200,255,0.6)' : 'rgba(255,120,100,0.6)';
+            rc.lineWidth = 1.2;
+            rc.beginPath(); rc.arc(x, y, r+2, 0, Math.PI*2); rc.stroke();
+            rc.restore();
+            const g = rc.createRadialGradient(x-4*rScale, y-4*rScale, 1, x, y, r);
+            if (isP1) {
+                g.addColorStop(0, '#a0e4ff');
+                g.addColorStop(0.5, '#2196f3');
+                g.addColorStop(1, '#0a3d7a');
+            } else {
+                g.addColorStop(0, '#ffb3c0');
+                g.addColorStop(0.5, '#f44336');
+                g.addColorStop(1, '#7a0a1a');
+            }
+            rc.fillStyle = g;
+            rc.beginPath(); rc.arc(x, y, r, 0, Math.PI*2); rc.fill();
+        } else {
+            rc.save();
+            rc.shadowColor = 'rgba(0,200,255,0.4)';
+            rc.shadowBlur = 4;
+            rc.strokeStyle = isHL ? '#f1c40f' : 'rgba(0,200,255,0.55)';
+            rc.lineWidth = 1.2;
+            const s = 5*rScale;
+            rc.beginPath();
+            rc.moveTo(x, y-s); rc.lineTo(x+s, y);
+            rc.lineTo(x, y+s); rc.lineTo(x-s, y);
+            rc.closePath(); rc.stroke();
+            rc.fillStyle = 'rgba(0,200,255,0.7)';
+            rc.beginPath(); rc.arc(x, y, 2*rScale, 0, Math.PI*2); rc.fill();
+            rc.restore();
+        }
+
+        // 제거 표시
+        if (snap.removed === i) {
+            rc.save();
+            rc.shadowColor = '#ff3a6e';
+            rc.shadowBlur = 10;
+            rc.strokeStyle = '#ff3a6e';
+            rc.lineWidth = 2;
+            const d = 8*rScale;
+            rc.beginPath(); rc.moveTo(x-d, y-d); rc.lineTo(x+d, y+d); rc.stroke();
+            rc.beginPath(); rc.moveTo(x+d, y-d); rc.lineTo(x-d, y+d); rc.stroke();
+            rc.restore();
+        }
+
+        rc.fillStyle = 'rgba(0,200,255,0.35)';
+        rc.font = `bold ${9*rScale}px monospace`;
+        rc.fillText((i+1).toString(), x+8*rScale, y+16*rScale);
+    }
+}
+
+function replayHighlightMill(mill, colorA, colorB) {
+    const [a, b, c] = mill.map(i => [p[i][0]*rScale, p[i][1]*rScale]);
+    const grad = replayCtx.createLinearGradient(a[0], a[1], c[0], c[1]);
+    grad.addColorStop(0, colorA); grad.addColorStop(0.5, colorB); grad.addColorStop(1, colorA);
+    replayCtx.save();
+    replayCtx.shadowColor = colorA; replayCtx.shadowBlur = 12;
+    replayCtx.strokeStyle = grad; replayCtx.lineWidth = 4; replayCtx.lineCap = 'round';
+    replayCtx.beginPath();
+    replayCtx.moveTo(a[0], a[1]); replayCtx.lineTo(b[0], b[1]); replayCtx.lineTo(c[0], c[1]);
+    replayCtx.stroke();
+    replayCtx.restore();
+}
+
+function replayUpdateUI() {
+    const total = replaySnapshots.length - 1;
+    const snap  = replaySnapshots[replayIdx];
+    document.getElementById('replay-info').textContent =
+        replayIdx === 0 ? '초기 상태 (게임 시작 전)' : `${replayIdx}번째 수: ${snap.desc}`;
+    // 숫자 입력창 + 전체 턴 라벨
+    const input = document.getElementById('replay-turn-input');
+    if (input) input.value = replayIdx;
+    const totalLabel = document.getElementById('replay-total-label');
+    if (totalLabel) totalLabel.textContent = `/ ${total}`;
+    // 입력창 max 설정
+    if (input) input.max = total;
+    document.getElementById('rprev-btn').disabled = replayIdx === 0;
+    document.getElementById('rnext-btn').disabled = replayIdx === total;
+    const pct = total === 0 ? 0 : (replayIdx / total) * 100;
+    document.getElementById('replay-progress-fill').style.width = pct + '%';
+}
+
+// 숫자 입력으로 턴 이동
+function replayGoToInput() {
+    const input = document.getElementById('replay-turn-input');
+    if (!input || replaySnapshots.length === 0) return;
+    const total = replaySnapshots.length - 1;
+    let val = parseInt(input.value);
+    if (isNaN(val)) val = 0;
+    val = Math.max(0, Math.min(total, val)); // 범위 클램프
+    replayIdx = val;
+    replayDraw();
+    replayUpdateUI();
+    input.blur(); // 키보드 닫기 (모바일)
+}
+
+function replayNext()  { if (replayIdx < replaySnapshots.length - 1) { replayIdx++; replayDraw(); replayUpdateUI(); } }
+function replayPrev()  { if (replayIdx > 0) { replayIdx--; replayDraw(); replayUpdateUI(); } }
+function replayFirst() { replayIdx = 0; replayDraw(); replayUpdateUI(); }
+function replayLast()  { replayIdx = replaySnapshots.length - 1; replayDraw(); replayUpdateUI(); }
+
+function replaySeek(e) {
+    if (replaySnapshots.length < 2) return;
+    const bar  = document.getElementById('replay-progress');
+    const rect = bar.getBoundingClientRect();
+    const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    replayIdx  = Math.round(pct * (replaySnapshots.length - 1));
+    replayDraw(); replayUpdateUI();
+}
+
+// 방향키 → 리플레이 오버레이 열려있을 때만 동작
+document.addEventListener('keydown', e => {
+    if (!document.getElementById('replay-overlay').classList.contains('show')) return;
+    if (replaySnapshots.length === 0) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); replayNext(); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); replayPrev(); }
+    if (e.key === 'ArrowUp' || e.key === 'Home') { e.preventDefault(); replayFirst(); }
+    if (e.key === 'ArrowDown' || e.key === 'End') { e.preventDefault(); replayLast(); }
+});
+
+// 오버레이 바깥 클릭 시 닫기
+document.getElementById('tutorial-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeTutorial();
+});
+document.getElementById('replay-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeReplay();
+});
+</script>
+</body>
+</html>
