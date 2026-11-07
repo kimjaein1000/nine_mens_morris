@@ -606,7 +606,13 @@ canvas {
     margin: 0 auto 16px;
     max-width: 100%;
     transition: background 0.4s, border-color 0.4s;
+    touch-action: manipulation;          /* 더블탭 확대 지연 제거 */
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
+
+/* 말판을 카드 폭에 맞춰 크게 (모바일에서 손끝 여유 확보, 정사각 유지) */
+#board { width: 100%; height: auto; max-width: 500px; }
 
 /* ── 메뉴 버튼 영역 ── */
 #menu {
@@ -2619,10 +2625,15 @@ function chooseBestRemoval(aiPlayer, targets) {
 canvas.addEventListener("click", e => {
     if (isAI() || gameOver) return;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left, y = e.clientY - rect.top;
-    let idx = -1;
+    // CSS 픽셀 -> 캔버스 내부 좌표(500x500) 보정. 모바일처럼 화면이 축소되면 이 비율이 1이 아니다.
+    const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * sx, y = (e.clientY - rect.top) * sy;
+    // 허용 반경은 '화면上的' 약 24px를 내부 단위로 환산 (축소 화면에서도 같은 손끝 오차 보장)
+    const tol = 24 * Math.max(sx, sy);
+    let idx = -1, bestD = Infinity;
     for (let i = 0; i < 24; i++) {
-        if (Math.hypot(p[i][0] - x, p[i][1] - y) < 20) { idx = i; break; }
+        const d = Math.hypot(p[i][0] - x, p[i][1] - y);
+        if (d < tol && d < bestD) { bestD = d; idx = i; }
     }
     if (idx === -1) return;
 
